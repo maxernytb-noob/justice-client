@@ -1,0 +1,994 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Justice Client — Minecraft launcher</title>
+<meta name="description" content="Minecraft launcher pro hraní i natáčení: instance a mody, Justice Mod ve hře, přátelé a sdílení světů, klipy jedním tlačítkem.">
+<meta property="og:title" content="Justice Client">
+<meta property="og:description" content="Minecraft launcher pro hraní i natáčení — mody, Justice Mod, přátelé, sdílení světů a klipy.">
+<meta property="og:image" content="img/launcher-home.webp">
+<meta name="theme-color" content="#e11d38">
+<link rel="icon" href="icon.png">
+<style>
+  :root {
+    --bg:#060607; --bg2:#0b0b0d; --panel:#111114; --panel2:#16161a; --line:#222228; --line2:#2d2d35;
+    --text:#f1f0f3; --text2:#a6a4ad; --text3:#6d6b75; --red:#e11d38; --red2:#c8102e; --redglow:rgba(225,29,56,.35); --reddim:#2a0a10;
+    --r:18px;
+  }
+  * { box-sizing:border-box; }
+  [hidden] { display:none !important; }
+  html { scroll-behavior:smooth; scroll-padding-top:80px; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; overflow-x:hidden; }
+  img { max-width:100%; display:block; }
+  a { color:inherit; text-decoration:none; }
+  .wrap { max-width:1180px; margin:0 auto; padding:0 20px; }
+  html:not([lang=en]) [data-en], html[lang=en] [data-cs] { display:none !important; }
+  svg.i { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+
+
+  /* ---------- mods marquee ---------- */
+  .marquee { position:relative; overflow:hidden; margin:30px 0 8px; -webkit-mask-image:linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); mask-image:linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
+  .marquee .row { display:flex; gap:10px; width:max-content; animation:mq 60s linear infinite; margin-bottom:10px; }
+  .marquee .row.rev { animation-direction:reverse; animation-duration:70s; }
+  .marquee:hover .row { animation-play-state:paused; }
+  .marquee span { white-space:nowrap; border:1px solid var(--line2); background:var(--panel); border-radius:12px; padding:10px 16px; font-size:14.5px; font-weight:600; color:var(--text2); }
+  .marquee span.r { color:#ff8093; border-color:rgba(225,29,56,.4); background:var(--reddim); }
+  @keyframes mq { to { transform:translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .marquee .row { animation:none; } }
+
+  /* ---------- performance ---------- */
+  .perf-big { display:flex; align-items:center; justify-content:center; gap:34px; margin:26px 0 30px; flex-wrap:wrap; }
+  .perf-big .side { text-align:center; }
+  .perf-big .n { font-size:64px; font-weight:800; letter-spacing:-2px; line-height:1; }
+  .perf-big .n.r { color:var(--red); text-shadow:0 0 40px var(--redglow); }
+  .perf-big .l { color:var(--text3); font-size:14px; margin-top:6px; }
+  .perf-big .vs { font-size:18px; font-weight:800; color:var(--text3); padding:8px 14px; border:1px solid var(--line2); border-radius:12px; }
+  .bench { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px; }
+  .bench .b { background:linear-gradient(180deg, var(--panel), var(--bg2)); border:1px solid var(--line); border-radius:var(--r); padding:20px; }
+  .bench .b h3 { margin:0 0 12px; font-size:16px; }
+  .bar2 { display:flex; align-items:center; gap:10px; font-size:13.5px; margin:8px 0; }
+  .bar2 .t { width:120px; color:var(--text2); flex:none; }
+  .bar2 .track { flex:1; height:10px; border-radius:6px; background:var(--panel2); overflow:hidden; }
+  .bar2 .track i { display:block; height:100%; border-radius:6px; background:#55555f; width:0; transition:width 1.4s cubic-bezier(.22,1,.36,1); }
+  .bar2.j .track i { background:linear-gradient(90deg, var(--red2), #ff5a72); }
+  .bar2 .v { width:70px; text-align:right; font-weight:700; flex:none; }
+  .bench .spec { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+  .bench .spec span { font-size:12px; color:var(--text3); border:1px solid var(--line); border-radius:8px; padding:3px 8px; }
+  .note { color:var(--text3); font-size:13px; text-align:center; margin-top:16px; }
+
+  /* ---------- nav ---------- */
+  nav { position:sticky; top:0; z-index:50; background:rgba(6,6,7,.72); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-bottom:1px solid transparent; transition:border-color .2s; }
+  nav.scrolled { border-bottom-color:var(--line); }
+  nav .wrap { display:flex; align-items:center; gap:22px; height:64px; }
+  .brand { display:flex; align-items:center; gap:10px; font-weight:800; font-size:17px; letter-spacing:-.2px; }
+  .brand img { width:30px; height:30px; }
+  .brand b { color:var(--red); }
+  .links { display:flex; gap:4px; }
+  .links a { white-space:nowrap; color:var(--text2); font-size:14px; font-weight:600; padding:7px 11px; border-radius:9px; transition:color .15s, background .15s; }
+  .links a:hover { color:var(--text); background:var(--panel2); }
+  .sp { flex:1; }
+  .icon-btn { display:inline-grid; place-items:center; width:36px; height:36px; border-radius:10px; color:var(--text2); border:1px solid var(--line); background:none; cursor:pointer; transition:color .15s, border-color .15s; }
+  .icon-btn:hover { color:var(--text); border-color:var(--line2); }
+  .lang { font:inherit; font-size:13px; font-weight:600; width:auto; padding:0 10px; }
+  .btn { display:inline-flex; align-items:center; gap:9px; font-weight:700; border-radius:12px; padding:10px 18px; font-size:14px; transition:transform .12s, box-shadow .2s, background .15s, border-color .15s; border:1px solid transparent; cursor:pointer; font-family:inherit; }
+  .btn.red { background:var(--red2); color:#fff; }
+  .btn.red:hover { background:var(--red); transform:translateY(-1px); box-shadow:0 8px 28px var(--redglow); }
+  .btn.ghost { border-color:var(--line2); color:var(--text); background:rgba(255,255,255,.02); }
+  .btn.ghost:hover { border-color:#45454f; background:var(--panel2); }
+  .btn.big { font-size:17px; padding:15px 26px; border-radius:14px; }
+
+  /* ---------- hero ---------- */
+  .hero { position:relative; padding:80px 0 40px; text-align:center; }
+  .hero::before { content:""; position:absolute; inset:-64px 0 auto; height:760px; z-index:-1;
+    background:radial-gradient(50% 55% at 50% 0%, rgba(200,16,46,.30), transparent 70%), radial-gradient(30% 30% at 15% 30%, rgba(200,16,46,.10), transparent 70%);
+    pointer-events:none; }
+  .grid-bg { position:absolute; inset:-64px 0 auto; height:700px; z-index:-1; opacity:.35; pointer-events:none;
+    background-image:linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size:56px 56px;
+    mask-image:radial-gradient(60% 70% at 50% 10%, #000 20%, transparent 75%); -webkit-mask-image:radial-gradient(60% 70% at 50% 10%, #000 20%, transparent 75%); }
+  .pill { display:inline-flex; align-items:center; gap:8px; padding:6px 14px 6px 8px; border:1px solid var(--line2); border-radius:99px; background:rgba(17,17,20,.7); color:var(--text2); font-size:13px; font-weight:600; }
+  .pill .dot { background:var(--red); color:#fff; border-radius:99px; padding:1px 8px; font-size:12px; }
+  h1 { font-size:clamp(38px, 6.4vw, 72px); line-height:1.04; letter-spacing:-2px; margin:22px auto 18px; max-width:900px; font-weight:800; }
+  h1 em { font-style:normal; color:var(--red); }
+  .lead { color:var(--text2); font-size:clamp(16px, 2vw, 19px); max-width:640px; margin:0 auto 32px; }
+  .cta { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .meta { color:var(--text3); font-size:13px; margin-top:14px; min-height:20px; }
+  .shot-hero { margin:56px auto 0; max-width:1100px; perspective:1600px; }
+  .shot-hero .frame { transform:rotateX(9deg); transform-origin:50% 0; transition:transform .6s cubic-bezier(.2,.8,.2,1); }
+  .shot-hero:hover .frame { transform:rotateX(2deg); }
+  .frame { border-radius:14px; overflow:hidden; border:1px solid var(--line2); background:var(--bg2); box-shadow:0 0 0 1px rgba(255,255,255,.02), 0 40px 120px -20px rgba(225,29,56,.28), 0 30px 60px rgba(0,0,0,.6); }
+  .frame img { width:100%; height:auto; }
+
+  .shot-hero { position:relative; }
+  .float-player { position:absolute; right:-34px; bottom:-38px; width:31%; max-width:340px; height:auto; border-radius:18px; z-index:2;
+    box-shadow:0 30px 80px rgba(0,0,0,.65), 0 0 0 1px rgba(255,255,255,.07), 0 0 60px -10px var(--redglow); animation:floatp 7s ease-in-out infinite; }
+  @keyframes floatp { 50% { transform:translateY(-10px); } }
+  @media (max-width:760px) { .float-player { display:none; } }
+  @media (prefers-reduced-motion: reduce) { .float-player { animation:none; } }
+
+  /* ---------- versions ---------- */
+  .drops { display:grid; grid-template-columns:repeat(5, 1fr); gap:14px; }
+  .drop { position:relative; aspect-ratio:3/4; border-radius:18px; overflow:hidden; border:1px solid var(--line2); background:var(--panel); }
+  .drop img { width:100%; height:100%; object-fit:cover; transition:transform .7s cubic-bezier(.2,.8,.2,1); }
+  .drop:hover img { transform:scale(1.07); }
+  .drop::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(0,0,0,.85) 0%, rgba(0,0,0,.2) 45%, transparent 70%); pointer-events:none; }
+  .drop .t { position:absolute; left:16px; right:16px; bottom:14px; z-index:1; }
+  .drop .t b { display:block; font-size:21px; letter-spacing:-.4px; }
+  .drop .t span { color:var(--text2); font-size:13.5px; font-weight:600; }
+  .drop.new { border-color:rgba(225,29,56,.6); box-shadow:0 0 0 3px rgba(225,29,56,.15), 0 20px 50px -10px var(--redglow); }
+  .drop.new .tag { position:absolute; top:12px; left:12px; z-index:1; background:var(--red); color:#fff; font-size:11.5px; font-weight:800; letter-spacing:.6px; padding:3px 9px; border-radius:99px; }
+  @media (max-width:900px) { .drops { grid-template-columns:repeat(5, 62%); overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:6px; } .drop { scroll-snap-align:start; } }
+
+  .stats { display:grid; grid-template-columns:repeat(4, 1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--r); overflow:hidden; margin:70px 0 0; }
+  .stats div { background:var(--bg2); padding:22px; text-align:center; }
+  .stats b { display:block; font-size:28px; letter-spacing:-.5px; }
+  .stats span { color:var(--text3); font-size:13px; }
+
+  /* ---------- sections ---------- */
+  section.block { padding:110px 0 0; }
+  .kicker { display:inline-flex; align-items:center; gap:8px; color:var(--red); font-weight:700; font-size:13px; letter-spacing:1.6px; text-transform:uppercase; }
+  .kicker::before { content:""; width:18px; height:2px; background:var(--red); border-radius:2px; }
+  h2 { font-size:clamp(30px, 4.2vw, 46px); line-height:1.1; letter-spacing:-1.2px; margin:12px 0 14px; font-weight:800; }
+  h2 em { font-style:normal; color:var(--red); }
+  .sub { color:var(--text2); font-size:17px; max-width:640px; margin:0; }
+  .head { margin-bottom:38px; }
+  .head.center { text-align:center; }
+  .head.center .sub { margin:0 auto; }
+
+  .split { display:grid; grid-template-columns:1fr 1.25fr; gap:48px; align-items:center; }
+  .split.rev { grid-template-columns:1.25fr 1fr; }
+  .split.rev > :first-child { order:2; }
+  .feats { list-style:none; padding:0; margin:26px 0 0; display:grid; gap:14px; }
+  .feats li { display:flex; gap:14px; }
+  .feats .fi { display:grid; place-items:center; width:38px; height:38px; border-radius:11px; background:var(--reddim); color:#ff6b7f; flex:none; border:1px solid rgba(225,29,56,.25); }
+  .feats b { display:block; font-size:15.5px; }
+  .feats p { margin:1px 0 0; color:var(--text2); font-size:14.5px; }
+
+  /* tabs */
+  .tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px; }
+  .tab { font:inherit; font-size:14px; font-weight:600; color:var(--text2); background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:8px 14px; cursor:pointer; transition:all .15s; }
+  .tab:hover { color:var(--text); }
+  .tab.on { color:#fff; background:var(--reddim); border-color:rgba(225,29,56,.55); }
+  .tabview { position:relative; }
+  .tabview img { transition:opacity .35s; }
+  .tabview img:not(.on) { position:absolute; inset:0; opacity:0; pointer-events:none; }
+  .tabcap { color:var(--text2); font-size:15px; margin:14px 2px 0; min-height:48px; }
+
+  .shots3 { display:grid; grid-template-columns:repeat(3, 1fr); gap:18px; margin:26px 0; }
+  .shots3 .frame { align-self:start; }
+  .shots2v { display:grid; gap:16px; }
+  @media (max-width:860px) { .shots3 { grid-template-columns:1fr; } }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-top:22px; }
+  .card { background:linear-gradient(180deg, var(--panel), var(--bg2)); border:1px solid var(--line); border-radius:var(--r); padding:22px; transition:border-color .2s, transform .2s; }
+  .card:hover { border-color:var(--line2); transform:translateY(-2px); }
+  .card .fi { display:grid; place-items:center; width:40px; height:40px; border-radius:12px; background:var(--reddim); color:#ff6b7f; margin-bottom:14px; border:1px solid rgba(225,29,56,.25); }
+  .card h3 { margin:0 0 4px; font-size:17px; }
+  .card p { margin:0; color:var(--text2); font-size:14.5px; }
+
+  /* mod */
+  .modgrid { display:grid; gap:14px; max-width:1000px; margin:0 auto; }
+  .modgrid .stack { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .cap { position:relative; }
+  .cap span { position:absolute; left:12px; bottom:12px; background:rgba(6,6,7,.78); backdrop-filter:blur(6px); border:1px solid var(--line2); border-radius:9px; padding:4px 10px; font-size:13px; font-weight:600; }
+  .chips { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:26px; }
+  .chip { border:1px solid var(--line2); background:var(--panel); border-radius:99px; padding:6px 13px; font-size:13.5px; color:var(--text2); font-weight:600; }
+  .chip.r { color:#ff8093; border-color:rgba(225,29,56,.4); background:var(--reddim); }
+  .vers { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; align-items:center; margin-top:20px; color:var(--text3); font-size:13px; }
+  kbd { font:600 12.5px/1 ui-monospace, Consolas, monospace; background:var(--panel2); border:1px solid var(--line2); border-bottom-width:3px; border-radius:7px; padding:4px 8px; color:var(--text); }
+
+  /* world share flow */
+  .flow { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; gap:10px; align-items:center; margin-top:28px; }
+  .flow .n { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px; text-align:center; font-size:13.5px; color:var(--text2); }
+  .flow .n b { display:block; color:var(--text); font-size:14.5px; }
+  .flow .ar { color:var(--red); }
+
+  /* clips */
+  .hotkey { display:flex; align-items:center; gap:16px; margin-top:28px; padding:18px; border:1px solid var(--line); border-radius:var(--r); background:linear-gradient(90deg, rgba(225,29,56,.10), transparent 60%); }
+  .hotkey .k { font:800 26px/1 ui-monospace, Consolas, monospace; background:var(--panel2); border:1px solid var(--line2); border-bottom-width:5px; border-radius:12px; padding:14px 18px; }
+  .hotkey p { margin:0; color:var(--text2); font-size:14.5px; }
+  .hotkey b { color:var(--text); }
+  .rec { display:inline-flex; align-items:center; gap:6px; color:#ff8093; font-weight:700; font-size:13px; }
+  .rec::before { content:""; width:8px; height:8px; border-radius:50%; background:var(--red); animation:blink 1.4s infinite; }
+  @keyframes blink { 50% { opacity:.25; } }
+
+  /* servers */
+  .servers { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .srv { position:relative; overflow:hidden; border:1px solid var(--line); border-radius:22px; padding:28px; background:var(--panel); }
+  .srv::after { content:""; position:absolute; right:-80px; top:-80px; width:260px; height:260px; border-radius:50%; filter:blur(60px); opacity:.45; }
+  .srv.jsmp::after { background:#c8102e; }
+  .srv.ert::after { background:#1d7fe1; }
+  .srv h3 { font-size:24px; margin:0 0 6px; letter-spacing:-.4px; }
+  .srv p { color:var(--text2); margin:0 0 20px; font-size:15px; max-width:420px; }
+  .srv .row { display:flex; gap:10px; flex-wrap:wrap; position:relative; z-index:1; }
+  .ip { font:600 14px ui-monospace, Consolas, monospace; }
+  .copied { color:#4ade80 !important; border-color:#1f5f38 !important; }
+
+  /* download */
+  .dlbox { position:relative; overflow:hidden; border:1px solid var(--line2); border-radius:28px; padding:56px 28px; text-align:center;
+    background:radial-gradient(60% 90% at 50% 0%, rgba(200,16,46,.25), transparent 70%), var(--bg2); }
+  .dlbox img.logo { width:84px; height:84px; margin:0 auto 10px; animation:float 4s ease-in-out infinite; }
+  @keyframes float { 50% { transform:translateY(-8px); } }
+  .plat { display:grid; grid-template-columns:1fr 1fr; gap:14px; max-width:780px; margin:34px auto 0; text-align:left; }
+  .plat > div { background:rgba(17,17,20,.8); border:1px solid var(--line); border-radius:16px; padding:20px; }
+  .plat h4 { margin:0 0 4px; display:flex; align-items:center; gap:8px; font-size:16px; }
+  .plat p { margin:0 0 14px; color:var(--text2); font-size:14px; }
+  .plat .lnx-note { margin:0 0 14px; }
+  /* Linux picker: the three builds side by side */
+  dialog.lnx { width:min(980px, calc(100vw - 32px)); max-height:calc(100vh - 32px); padding:0; border:1px solid var(--line2); border-radius:24px;
+    background:var(--bg2); color:var(--text); box-shadow:0 40px 120px rgba(0,0,0,.6); }
+  dialog.lnx::backdrop { background:rgba(0,0,0,.65); backdrop-filter:blur(6px); }
+  dialog.lnx[open] { animation:pop .25s cubic-bezier(.2,.8,.2,1); }
+  @keyframes pop { from { opacity:0; transform:translateY(12px) scale(.98); } }
+  .lnx-in { padding:30px; }
+  .lnx-head { display:flex; align-items:flex-start; gap:12px; margin-bottom:22px; }
+  .lnx-head h3 { margin:0 0 4px; font-size:24px; letter-spacing:-.4px; }
+  .lnx-head p { margin:0; color:var(--text2); font-size:15px; }
+  .lnx-x { margin-left:auto; flex:none; width:36px; height:36px; border-radius:10px; border:1px solid var(--line); background:var(--panel); color:var(--text2); font-size:20px; cursor:pointer; }
+  .lnx-x:hover { color:var(--text); border-color:var(--line2); }
+  .lnx-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; }
+  .lnx-card { display:flex; flex-direction:column; background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:20px; text-align:left; }
+  .lnx-card:hover { border-color:var(--line2); }
+  .lnx-card .tag { align-self:flex-start; font-weight:700; font-size:11px; line-height:1; letter-spacing:.6px; text-transform:uppercase; color:#ff8093; background:var(--reddim); padding:6px 9px; border-radius:999px; margin-bottom:14px; }
+  .lnx-card h4 { margin:0 0 6px; font-size:18px; }
+  .lnx-card .for { margin:0 0 14px; color:var(--text2); font-size:14px; min-height:40px; }
+  .lnx-card code { display:block; margin:0 0 16px; }
+  .lnx-card .btn { margin-top:auto; justify-content:center; }
+  .lnx-foot { margin:18px 0 0; color:var(--text3); font-size:13px; }
+  code { font:13px ui-monospace, Consolas, monospace; background:var(--panel2); border:1px solid var(--line); padding:3px 7px; border-radius:7px; word-break:break-all; }
+
+  .steps { display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; margin-top:22px; }
+  .step { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:18px; font-size:14.5px; color:var(--text2); }
+  .step b { color:var(--text); }
+  .step .n { display:inline-grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--reddim); color:#ff8093; font-weight:800; margin-bottom:10px; }
+  /* Mock of the Windows SmartScreen dialog so people recognise it. */
+  .ss { background:#0063b1; color:#fff; border-radius:6px; padding:14px; margin-top:12px; }
+  .ss .t { font-size:16px; font-weight:600; margin-bottom:6px; }
+  .ss .m { font-size:12px; opacity:.9; }
+  .ss .link { text-decoration:underline; font-size:12px; margin-top:8px; display:inline-block; outline:2px dashed #ffd400; outline-offset:3px; }
+  .ss .btns { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
+  .ss .b { border:1px solid #fff; padding:4px 12px; font-size:12px; }
+  .ss .b.hl { outline:2px dashed #ffd400; outline-offset:3px; }
+  details.smart { margin-top:22px; border:1px solid var(--line); border-radius:16px; background:var(--bg2); padding:0 20px; text-align:left; }
+  details.smart > summary { padding:16px 0; }
+
+  /* faq */
+  .faq { display:grid; gap:10px; max-width:820px; margin:0 auto; }
+  details { border:1px solid var(--line); border-radius:14px; background:var(--panel); padding:0 20px; transition:border-color .2s; }
+  details[open] { border-color:var(--line2); }
+  summary { cursor:pointer; list-style:none; padding:17px 0; font-weight:700; display:flex; align-items:center; gap:12px; }
+  summary::-webkit-details-marker { display:none; }
+  summary::after { content:"+"; margin-left:auto; color:var(--red); font-size:22px; font-weight:400; transition:transform .2s; }
+  details[open] > summary::after { transform:rotate(45deg); }
+  details > div { color:var(--text2); padding:0 0 18px; font-size:15px; }
+
+  footer { margin-top:120px; border-top:1px solid var(--line); padding:40px 0 50px; color:var(--text3); font-size:14px; }
+  footer .wrap { display:flex; gap:40px; flex-wrap:wrap; }
+  footer .col { display:grid; gap:8px; align-content:start; }
+  footer .brand { color:var(--text); }
+  footer .brand b { color:var(--red); margin:0; font-size:inherit; }
+  footer .col b { color:var(--text); font-size:14px; margin-bottom:4px; }
+  footer a:hover { color:var(--text); }
+  footer .legal { flex-basis:100%; border-top:1px solid var(--line); padding-top:20px; font-size:13px; }
+
+  /* reveal on scroll */
+  .rv { opacity:0; transform:translateY(22px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1); }
+  .rv.in { opacity:1; transform:none; }
+  @media (prefers-reduced-motion: reduce) { .rv { opacity:1; transform:none; transition:none; } .shot-hero .frame { transform:none; } * { animation:none !important; } }
+
+  @media (max-width: 980px) {
+    .links { display:none; }
+    .split, .split.rev, .servers, .plat, .lnx-grid { grid-template-columns:1fr; }
+    .lnx-card .for { min-height:0; }
+    .split.rev > :first-child { order:0; }
+    .cards, .steps { grid-template-columns:1fr 1fr; }
+    .stats { grid-template-columns:1fr 1fr; }
+  }
+  @media (max-width: 620px) {
+    .cards, .steps, .modgrid .stack { grid-template-columns:1fr; }
+    .flow { grid-template-columns:1fr; }
+    .flow .ar { transform:rotate(90deg); justify-self:center; }
+    nav .btn.red span.t { display:none; }
+    .hero { padding-top:50px; }
+    section.block { padding-top:80px; }
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 21h16"/></symbol>
+  <symbol id="i-yt" viewBox="0 0 24 24"><path d="M2.5 7.5c.2-1.7 1.4-2.8 3-3C8 4.2 10 4 12 4s4 .2 6.5.5c1.6.2 2.8 1.3 3 3 .3 2.9.3 6.1 0 9-.2 1.7-1.4 2.8-3 3-2.5.3-4.5.5-6.5.5s-4-.2-6.5-.5c-1.6-.2-2.8-1.3-3-3-.3-2.9-.3-6.1 0-9z"/><path d="m10 9 5 3-5 3z"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></symbol>
+  <symbol id="i-puzzle" viewBox="0 0 24 24"><path d="M10 3a2 2 0 1 1 4 0v2h4a1 1 0 0 1 1 1v4h-2a2 2 0 1 0 0 4h2v4a1 1 0 0 1-1 1h-4v-2a2 2 0 1 0-4 0v2H6a1 1 0 0 1-1-1v-4h2a2 2 0 1 0 0-4H5V6a1 1 0 0 1 1-1h4z"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+  <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></symbol>
+  <symbol id="i-film" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 8h4M3 12h4M3 16h4M17 8h4M17 12h4M17 16h4"/></symbol>
+  <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.7 1.5-1.5 0-1.2-1-1.5-1-2.5 0-.8.7-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.1-4-7.5-9-7.5z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.9-4M4 4v4h4M4 13a8 8 0 0 0 14.9 4M20 20v-4h-4"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-3.5 3.2-5.5 6.5-5.5s6 2 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .6 3.3 2.4 3.5 5.2"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12z"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></symbol>
+  <symbol id="i-win" viewBox="0 0 24 24"><path d="M3 5.5 10 4.5v7H3zM12 4.2 21 3v8.5h-9zM3 12.5h7v7L3 18.5zM12 12.5h9V21l-9-1.2z"/></symbol>
+  <symbol id="i-linux" viewBox="0 0 24 24"><path d="M12 3 4 20h16z"/><path d="M9 14.5c1.8-1.5 4.2-1.5 6 0"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/></symbol>
+  <symbol id="i-cursor" viewBox="0 0 24 24"><path d="M4 4l7 17 2.5-7L21 11.5z"/></symbol>
+</svg>
+
+<nav id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="icon.png" alt="">Justice <b>Client</b></a>
+    <div class="links">
+      <a href="#launcher" data-cs>Launcher</a><a href="#launcher" data-en>Launcher</a>
+      <a href="#modpacks" data-cs>Modpacky</a><a href="#modpacks" data-en>Modpacks</a>
+      <a href="#versions" data-cs>Verze</a><a href="#versions" data-en>Versions</a>
+      <a href="#performance" data-cs>Výkon</a><a href="#performance" data-en>Performance</a>
+      <a href="#music" data-cs>Hudba</a><a href="#music" data-en>Music</a>
+      <a href="#mod">Justice Mod</a>
+      <a href="#friends" data-cs>Přátelé</a><a href="#friends" data-en>Friends</a>
+      <a href="#clips">Clips</a>
+      <a href="#servers" data-cs>Servery</a><a href="#servers" data-en>Servers</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <span class="sp"></span>
+    <a class="icon-btn" href="https://www.youtube.com/@maxernMC" target="_blank" rel="noopener" title="YouTube @maxernMC"><svg class="i"><use href="#i-yt"/></svg></a>
+    <button class="icon-btn lang" id="lang" type="button">EN</button>
+    <a class="btn red" href="#download"><svg class="i"><use href="#i-dl"/></svg><span class="t" data-cs>Stáhnout</span><span class="t" data-en>Download</span></a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="grid-bg"></div>
+  <div class="wrap">
+    <span class="pill"><span class="dot" id="pillver">NEW</span>
+      <span data-cs>Nová Home podle verzí Minecraftu</span><span data-en>A new home built around Minecraft versions</span>
+    </span>
+    <h1 data-cs>Minecraft launcher,<br>který <em>hraje s tebou</em>.</h1>
+    <h1 data-en>The Minecraft launcher<br>that <em>plays with you</em>.</h1>
+    <p class="lead">
+      <span data-cs>Instance a mody na pár kliků, vlastní menu ve hře, přátelé s chatem, hudba přímo v launcheru i ve hře a klipy jedním tlačítkem. Zdarma, bez reklam, pro Windows i Linux.</span>
+      <span data-en>Instances and mods in a few clicks, a custom in-game menu, friends with chat, music right in the launcher and in game, and one-button clips. Free, no ads, for Windows and Linux.</span>
+    </p>
+    <div class="cta">
+      <a class="btn red big" id="dl-main" href="JusticeClient-setup.exe" download><svg class="i"><use href="#i-win"/></svg><span data-cs>Stáhnout pro Windows</span><span data-en>Download for Windows</span></a>
+      <a class="btn ghost big" href="#launcher"><span data-cs>Co to umí</span><span data-en>See features</span><svg class="i"><use href="#i-arrow"/></svg></a>
+    </div>
+    <div class="meta" id="ver">&nbsp;</div>
+    <div class="shot-hero">
+      <div class="frame"><img src="img/launcher-hero.webp" width="1416" height="808" alt="Justice Client — domovská obrazovka"></div>
+      <img class="float-player" src="img/float-player.webp" width="541" height="254" alt="">
+    </div>
+
+    <div class="stats rv">
+      <div><b>5</b><span data-cs>loaderů · Vanilla až NeoForge</span><span data-en>loaders · Vanilla to NeoForge</span></div>
+      <div><b>1.8.9 → 26.3</b><span data-cs>verze Minecraftu</span><span data-en>Minecraft versions</span></div>
+      <div><b>4</b><span data-cs>hotové balíčky modů</span><span data-en>ready-made mod packs</span></div>
+      <div><b>F8</b><span data-cs>a klip je uložený</span><span data-en>and the clip is saved</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ VERSIONS ============ -->
+  <section class="block" id="versions">
+    <div class="head center rv">
+      <span class="kicker" data-cs>Verze</span><span class="kicker" data-en>Versions</span>
+      <h2 data-cs>Každý update, <em>jedním klikem</em>.</h2>
+      <h2 data-en>Every update, <em>one click away</em>.</h2>
+      <p class="sub" data-cs>Domovská obrazovka ukazuje nejnovější verze Minecraftu s jejich oficiálními obrázky. Vybereš verzi, klikneš na Hrát a launcher si instanci s Fabricem, optimalizacemi a Justice Modem připraví sám.</p>
+      <p class="sub" data-en>The home screen shows the newest Minecraft versions with their official art. Pick one, hit Play, and the launcher sets up an instance with Fabric, optimizations and Justice Mod by itself.</p>
+    </div>
+    <div class="drops">
+      <div class="drop rv new"><span class="tag" data-cs>NOVÉ</span><span class="tag" data-en>NEW</span><img src="https://justiceclient.online/art/wilderness-bound.jpg" alt="Wilderness Bound" loading="lazy"><div class="t"><b>26.3</b><span>Wilderness Bound</span></div></div>
+      <div class="drop rv"><img src="https://justiceclient.online/art/chaos-cubed.jpg" alt="Chaos Cubed" loading="lazy"><div class="t"><b>26.2</b><span>Chaos Cubed</span></div></div>
+      <div class="drop rv"><img src="https://justiceclient.online/art/tiny-takeover.jpg" alt="Tiny Takeover" loading="lazy"><div class="t"><b>26.1.2</b><span>Tiny Takeover</span></div></div>
+      <div class="drop rv"><img src="https://justiceclient.online/art/mounts-of-mayhem.jpg" alt="Mounts of Mayhem" loading="lazy"><div class="t"><b>1.21.11</b><span>Mounts of Mayhem</span></div></div>
+      <div class="drop rv"><img src="https://justiceclient.online/art/copper-age.jpg" alt="The Copper Age" loading="lazy"><div class="t"><b>1.21.10</b><span>The Copper Age</span></div></div>
+    </div>
+  </section>
+
+  <!-- ============ LAUNCHER ============ -->
+  <section class="block" id="launcher">
+    <div class="split">
+      <div class="rv">
+        <span class="kicker" data-cs>Launcher a instance</span><span class="kicker" data-en>Launcher & instances</span>
+        <h2 data-cs>Každá hra ve <em>vlastní</em> instanci.</h2>
+        <h2 data-en>Every game in its <em>own</em> instance.</h2>
+        <p class="sub" data-cs>Vanilla, Fabric, Quilt, Forge i NeoForge vedle sebe. Každá karta ukazuje, na jakém světě nebo serveru jsi naposledy hrál.</p>
+        <p class="sub" data-en>Vanilla, Fabric, Quilt, Forge and NeoForge side by side. Every card shows the world or server you last played on.</p>
+        <ul class="feats">
+          <li><span class="fi"><svg class="i"><use href="#i-puzzle"/></svg></span><div>
+            <b data-cs>Modrinth a CurseForge v jednom</b><b data-en>Modrinth and CurseForge in one</b>
+            <p data-cs>Hledání, závislosti se stáhnou samy, import .mrpack, CurseForge a .dawnpack.</p>
+            <p data-en>Search, dependencies download themselves, import .mrpack, CurseForge and .dawnpack.</p></div></li>
+          <li><span class="fi"><svg class="i"><use href="#i-box"/></svg></span><div>
+            <b data-cs>Hotové balíčky</b><b data-en>Ready-made packs</b>
+            <p data-cs>Cinematic, SMP, PvP a PvP 1.8.9 — optimalizované, se Simple Voice Chatem.</p>
+            <p data-en>Cinematic, SMP, PvP and PvP 1.8.9 — optimised, with Simple Voice Chat.</p></div></li>
+          <li><span class="fi"><svg class="i"><use href="#i-bolt"/></svg></span><div>
+            <b data-cs>Víc FPS bez práce</b><b data-en>More FPS, no effort</b>
+            <p data-cs>Chytré nastavení RAM a Javy, Sodium, vysoká priorita a analýza pádů.</p>
+            <p data-en>Smart RAM and Java settings, Sodium, high priority and crash analysis.</p></div></li>
+          <li><span class="fi"><svg class="i"><use href="#i-palette"/></svg></span><div>
+            <b data-cs>Uprav si ho</b><b data-en>Make it yours</b>
+            <p data-cs>5 motivů (Justice, Midnight, Aurora, Sakura, Mono), vlastní barva, obrázek na pozadí, pořadí panelu i ikony instancí.</p>
+            <p data-en>5 themes (Justice, Midnight, Aurora, Sakura, Mono), your own colour, a background picture, sidebar order and instance icons.</p></div></li>
+        </ul>
+      </div>
+      <div class="rv">
+        <div class="tabs" id="ltabs">
+          <button class="tab on" data-i="0"><span data-cs>Domů</span><span data-en>Home</span></button>
+          <button class="tab" data-i="1"><span data-cs>Instance</span><span data-en>Instances</span></button>
+          <button class="tab" data-i="2"><span data-cs>Mody</span><span data-en>Mods</span></button>
+          <button class="tab" data-i="3"><span data-cs>Servery</span><span data-en>Servers</span></button>
+          <button class="tab" data-i="4"><span data-cs>Vzhled</span><span data-en>Appearance</span></button>
+        </div>
+        <div class="frame tabview" id="lview">
+          <img class="on" src="img/launcher-home.webp" width="1416" height="808" alt="" loading="lazy">
+          <img src="img/launcher-instances.webp" width="1416" height="808" alt="" loading="lazy">
+          <img src="img/launcher-mods.webp" width="1416" height="808" alt="" loading="lazy">
+          <img src="img/launcher-servers.webp" width="1416" height="808" alt="" loading="lazy">
+          <img src="img/launcher-settings.webp" width="1416" height="808" alt="" loading="lazy">
+        </div>
+        <p class="tabcap" id="lcap"></p>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card rv"><div class="fi"><svg class="i"><use href="#i-film"/></svg></div><h3 data-cs>Režim natáčení</h3><h3 data-en>Recording mode</h3>
+        <p data-cs>Flashback, čisté nastavení hry pro záběry a OBS, které začne nahrávat samo.</p><p data-en>Flashback, clean game settings for footage and OBS that starts recording by itself.</p></div>
+      <div class="card rv"><div class="fi"><svg class="i"><use href="#i-shield"/></svg></div><h3 data-cs>Účty Microsoft</h3><h3 data-en>Microsoft accounts</h3>
+        <p data-cs>Přihlášení přes Microsoft, víc účtů, skiny a capy s 3D náhledem.</p><p data-en>Microsoft sign-in, multiple accounts, skins and capes with a 3D preview.</p></div>
+      <div class="card rv"><div class="fi"><svg class="i"><use href="#i-refresh"/></svg></div><h3 data-cs>Samo se aktualizuje</h3><h3 data-en>Updates itself</h3>
+        <p data-cs>Podepsané aktualizace jedním klikem, zálohy a snapshoty světů.</p><p data-en>Signed one-click updates, backups and world snapshots.</p></div>
+      <div class="card rv"><div class="fi"><svg class="i"><use href="#i-trophy"/></svg></div><h3 data-cs>8 tajemství</h3><h3 data-en>8 secrets</h3>
+        <p data-cs>V launcheru je schovaných osm easter eggů. Nastavení ti napoví, kolik jich zbývá.</p><p data-en>Eight easter eggs are hidden in the launcher. Settings hint at how many are left.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ MODS ============ -->
+  <section class="block" id="mods">
+    <div class="head center rv">
+      <span class="kicker" data-cs>Mody</span><span class="kicker" data-en>Mods</span>
+      <h2 data-cs>Ty nejlepší mody, <em>už v balíčku</em>.</h2>
+      <h2 data-en>The best mods, <em>already bundled</em>.</h2>
+      <p class="sub" data-cs>Každá nová instance dostane rovnou balíček optimalizací a Justice Mod. Další mody přidáš z Modrinthu a CurseForge jedním klikem.</p>
+      <p class="sub" data-en>Every new instance gets the optimization pack and Justice Mod right away. Add more from Modrinth and CurseForge in one click.</p>
+    </div>
+    <div class="marquee rv">
+      <div class="row"><span class="r">Sodium</span><span class="r">Lithium</span><span class="">Entity Culling</span><span class="">ImmediatelyFast</span><span class="">FerriteCore</span><span class="">Sodium Extra</span><span class="">Reese's Sodium Options</span><span class="">ModernFix</span><span class="">Dynamic FPS</span><span class="r">Iris Shaders</span><span class="">Distant Horizons</span><span class="r">Flashback</span><span class="r">Sodium</span><span class="r">Lithium</span><span class="">Entity Culling</span><span class="">ImmediatelyFast</span><span class="">FerriteCore</span><span class="">Sodium Extra</span><span class="">Reese's Sodium Options</span><span class="">ModernFix</span><span class="">Dynamic FPS</span><span class="r">Iris Shaders</span><span class="">Distant Horizons</span><span class="r">Flashback</span></div>
+      <div class="row rev"><span class="">Zoomify</span><span class="">Simple Voice Chat</span><span class="">Xaero's Minimap</span><span class="">AppleSkin</span><span class="">No Chat Reports</span><span class="">Freecam</span><span class="">Continuity</span><span class="">LambDynamicLights</span><span class="">Jade</span><span class="">Mod Menu</span><span class="">Mouse Tweaks</span><span class="r">Justice Mod</span><span class="">Zoomify</span><span class="">Simple Voice Chat</span><span class="">Xaero's Minimap</span><span class="">AppleSkin</span><span class="">No Chat Reports</span><span class="">Freecam</span><span class="">Continuity</span><span class="">LambDynamicLights</span><span class="">Jade</span><span class="">Mod Menu</span><span class="">Mouse Tweaks</span><span class="r">Justice Mod</span></div>
+    </div>
+    <div class="cards">
+      <div class="card rv"><div class="fi"><svg class="i"><use href="#i-bolt"/></svg></div><h3 data-cs>Vždy aktuální</h3><h3 data-en>Always up to date</h3>
+        <p data-cs>Hlídáme nejnovější optimalizační mody a launcher ti je sám aktualizuje.</p><p data-en>We follow the newest performance mods and the launcher updates them for you.</p></div>
+      <div class="card rv"><div class="fi"><svg class="i"><use href="#i-palette"/></svg></div><h3 data-cs>Jedno menu</h3><h3 data-en>One menu</h3>
+        <p data-cs>Pravý Shift otevře Justice menu: moduly, HUD, klávesy i motivy na jednom místě.</p><p data-en>Right Shift opens the Justice menu: modules, HUD, keybinds and themes in one place.</p></div>
+      <div class="card rv"><div class="fi"><svg class="i"><use href="#i-puzzle"/></svg></div><h3 data-cs>Vyber si</h3><h3 data-en>Your choice</h3>
+        <p data-cs>Co nechceš, vypneš. Vlastní mody přetáhneš rovnou do okna instance.</p><p data-en>Turn off what you don't want. Drop your own mods straight into the instance.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ MODPACKS ============ -->
+  <section class="block" id="modpacks">
+    <div class="head center rv">
+      <span class="kicker" data-cs>Modpacky</span><span class="kicker" data-en>Modpacks</span>
+      <h2 data-cs>Modpacky, co se <em>samy spraví</em>.</h2>
+      <h2 data-en>Modpacks that <em>fix themselves</em>.</h2>
+      <p class="sub" data-cs>Poradce MaxPack ti sestaví balíček na míru, průvodce opravou vyřeší konflikty a duplicity, a všechno se stahuje na pozadí jako v CurseForge.</p>
+      <p class="sub" data-en>The MaxPack helper builds a pack for you, the repair wizard fixes conflicts and duplicates, and everything downloads in the background like CurseForge.</p>
+    </div>
+    <div class="shots3 rv">
+      <div class="frame"><img src="img/web-maxpack.webp" alt="MaxPack" loading="lazy"></div>
+      <div class="frame"><img src="img/web-repair.webp" alt="Repair wizard" loading="lazy"></div>
+      <div class="frame"><img src="img/web-downloads.webp" alt="Download manager" loading="lazy"></div>
+    </div>
+    <div class="cards">
+      <div class="card rv"><div class="fi"><svg class="i"><use href="#i-bolt"/></svg></div><h3 data-cs>MaxPack poradce</h3><h3 data-en>MaxPack helper</h3>
+        <p data-cs>Napíšeš, jaký modpack chceš, a bot navrhne reálné mody z Modrinthu. Zdarma, bez API klíče.</p><p data-en>Describe the modpack you want and the bot suggests real Modrinth mods. Free, no API key.</p></div>
+      <div class="card rv"><div class="fi"><svg class="i"><use href="#i-puzzle"/></svg></div><h3 data-cs>Oprava jedním klikem</h3><h3 data-en>One-click repair</h3>
+        <p data-cs>Projde duplicity, chybějící závislosti, konflikty verzí i poslední pád — s náhledem a vrácením.</p><p data-en>Checks duplicates, missing dependencies, version conflicts and the last crash — with preview and undo.</p></div>
+      <div class="card rv"><div class="fi"><svg class="i"><use href="#i-dl"/></svg></div><h3 data-cs>Stahování na pozadí</h3><h3 data-en>Background downloads</h3>
+        <p data-cs>Fronta nahoře v liště s rychlostí a ETA, pauza i zrušení — launcher jde mezitím používat dál.</p><p data-en>A top-bar queue with speed and ETA, pause and cancel — keep using the launcher meanwhile.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ COSMETICS ============ -->
+  <section class="block" id="cosmetics">
+    <div class="split">
+      <div class="rv">
+        <span class="kicker" data-cs>Vzhled</span><span class="kicker" data-en>Cosmetics</span>
+        <h2 data-cs>Pláště a <em>mazlíčci</em>.</h2>
+        <h2 data-en>Capes and <em>pets</em>.</h2>
+        <p class="sub" data-cs>28 plášťů a 12 mazlíčků, které vidí i ostatní hráči Justice Clientu přímo ve hře. Knihovna skinů navíc umí ukládat víc skinů a přepínat mezi nimi jedním klikem.</p>
+        <p class="sub" data-en>28 capes and 12 pets that other Justice Client players see in-game. The skin library saves several skins and switches between them in one click.</p>
+        <ul class="feats">
+          <li><span class="fi"><svg class="i"><use href="#i-palette"/></svg></span><div>
+            <b data-cs>28 plášťů</b><b data-en>28 capes</b>
+            <p data-cs>Od ohnivých přes galaxii po drahokamy — vykreslí se i na elytrách.</p>
+            <p data-en>From fiery to galaxy to gems — rendered on elytra too.</p></div></li>
+          <li><span class="fi"><svg class="i"><use href="#i-puzzle"/></svg></span><div>
+            <b data-cs>12 mazlíčků</b><b data-en>12 pets</b>
+            <p data-cs>Liška, dráček, axolotl a další tě doprovází ve hře.</p>
+            <p data-en>A fox, a dragon, an axolotl and more follow you in-game.</p></div></li>
+          <li><span class="fi"><svg class="i"><use href="#i-share"/></svg></span><div>
+            <b data-cs>Knihovna skinů</b><b data-en>Skin library</b>
+            <p data-cs>Ulož si víc skinů a přepínej mezi nimi — funguje i pro offline účty.</p>
+            <p data-en>Save several skins and switch between them — works for offline accounts too.</p></div></li>
+        </ul>
+      </div>
+      <div class="rv shots2v">
+        <div class="frame"><img src="img/web-capes.webp" alt="Capes" loading="lazy"></div>
+        <div class="frame"><img src="img/web-pets.webp" alt="Pets" loading="lazy"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PERFORMANCE ============ -->
+  <section class="block" id="performance">
+    <div class="head center rv">
+      <span class="kicker" data-cs>Výkon</span><span class="kicker" data-en>Performance</span>
+      <h2 data-cs>Míň sekání, <em>když na tom záleží</em>.</h2>
+      <h2 data-en>Less stutter, <em>when it matters</em>.</h2>
+      <p class="sub" data-cs>Měřeno vestavěným benchmarkem v Justice Modu: postava běží novým terénem a dohled se mění mezi 8 a 20 chunky, takže se pořád načítá svět. Přesně tam se Minecraft seká nejvíc.</p>
+      <p class="sub" data-en>Measured with the benchmark built into Justice Mod: the player runs through new terrain while the render distance switches between 8 and 20 chunks, so the world keeps loading. That's where Minecraft stutters the most.</p>
+    </div>
+    <div class="perf-big rv">
+      <div class="side"><div class="n r">2×</div><div class="l" data-cs>kratší nejhorší zaseknutí</div><div class="l" data-en>shorter worst hitch</div></div>
+      <div class="vs">+</div>
+      <div class="side"><div class="n r">2,3×</div><div class="l" data-cs>méně zaseknutí přes 50 ms</div><div class="l" data-en>fewer hitches over 50 ms</div></div>
+    </div>
+    <div class="bench rv">
+      <div class="b">
+        <h3 data-cs>Nejhorší zaseknutí</h3><h3 data-en>Worst hitch</h3>
+        <div class="bar2 j"><span class="t">Justice Client</span><span class="track"><i data-w="51"></i></span><span class="v">111 ms</span></div>
+        <div class="bar2"><span class="t">Vanilla</span><span class="track"><i data-w="100"></i></span><span class="v">219 ms</span></div>
+        <div class="spec"><span data-cs>Čím míň, tím líp</span><span data-en>Lower is better</span></div>
+      </div>
+      <div class="b">
+        <h3 data-cs>Zaseknutí přes 50 ms za 30 s</h3><h3 data-en>Hitches over 50 ms per 30 s</h3>
+        <div class="bar2 j"><span class="t">Justice Client</span><span class="track"><i data-w="43"></i></span><span class="v">7,5</span></div>
+        <div class="bar2"><span class="t">Vanilla</span><span class="track"><i data-w="100"></i></span><span class="v">17,4</span></div>
+        <div class="spec"><span data-cs>Čím míň, tím líp</span><span data-en>Lower is better</span></div>
+      </div>
+      <div class="b">
+        <h3 data-cs>0,1 % nejhorších snímků</h3><h3 data-en>0.1% worst frames</h3>
+        <div class="bar2 j"><span class="t">Justice Client</span><span class="track"><i data-w="74"></i></span><span class="v">54 ms</span></div>
+        <div class="bar2"><span class="t">Vanilla</span><span class="track"><i data-w="100"></i></span><span class="v">73 ms</span></div>
+        <div class="spec"><span>Intel Core i3-12100F</span><span>GTX 1660 SUPER</span><span>1.21.11</span></div>
+      </div>
+    </div>
+    <p class="note" data-cs>Měřeno v říjnu 2026 na PC autora, 4 × 4 úseky po 30 s ve dvou dnech měření, vždy na čisté kopii světa. Vanilla = Fabric bez optimalizací. Výsledky se liší podle hardwaru.</p>
+    <p class="note" data-en>Measured in October 2026 on the author's PC, 4 × 4 runs of 30 s over two sessions, each on a fresh copy of the world. Vanilla = Fabric without optimizations. Results vary by hardware.</p>
+  </section>
+
+  <!-- ============ MUSIC ============ -->
+  <section class="block" id="music">
+    <div class="split">
+      <div class="rv">
+        <span class="kicker" data-cs>Hudba</span><span class="kicker" data-en>Music</span>
+        <h2 data-cs>Tvoje hudba, <em>aniž bys odešel ze hry</em>.</h2>
+        <h2 data-en>Your music, <em>without leaving the game</em>.</h2>
+        <p class="sub" data-cs>Launcher vidí, co hraje v Sonolithu, Spotify nebo prohlížeči. Obal písničky, posuv a ovládání máš v přehrávači, který si přetáhneš, kam chceš.</p>
+        <p class="sub" data-en>The launcher sees what's playing in Sonolith, Spotify or a browser. The cover, seek bar and controls sit in a player you can drag anywhere.</p>
+        <ul class="feats">
+          <li><span class="fi"><svg class="i"><use href="#i-music"/></svg></span><div>
+            <b data-cs>Přehrávač v launcheru</b><b data-en>Player in the launcher</b>
+            <p data-cs>Obal, název, posuv, pauza, další a předchozí písnička. Žádné propojování, prostě to funguje.</p>
+            <p data-en>Cover, title, seeking, pause, next and previous. Nothing to link, it just works.</p></div></li>
+          <li><span class="fi"><svg class="i"><use href="#i-key"/></svg></span><div>
+            <b data-cs>A ve hře taky</b><b data-en>And in game too</b>
+            <p data-cs>Modul Now Playing v Justice Modu ukáže písničku v HUD. <kbd>End</kbd> pauza, <kbd>Page Down</kbd> / <kbd>Page Up</kbd> další a předchozí.</p>
+            <p data-en>The Now Playing module in Justice Mod shows the song in your HUD. <kbd>End</kbd> pauses, <kbd>Page Down</kbd> / <kbd>Page Up</kbd> skip.</p></div></li>
+        </ul>
+      </div>
+      <div class="rv"><div class="frame"><img src="img/launcher-music.webp" width="756" height="448" alt="" loading="lazy"></div></div>
+    </div>
+  </section>
+
+  <!-- ============ JUSTICE MOD ============ -->
+  <section class="block" id="mod">
+    <div class="head center rv">
+      <span class="kicker">Justice Mod</span>
+      <h2 data-cs>Vlastní menu <em>přímo ve hře</em>.</h2>
+      <h2 data-en>Your own menu <em>right in the game</em>.</h2>
+      <p class="sub" data-cs>Stiskni <kbd>Pravý Shift</kbd> a zapni, co potřebuješ. HUD si rozložíš myší, uložíš jako preset a obarvíš motivem. Launcher ho do Fabric, NeoForge i Forge instancí přidá sám — a jedním přepínačem ho zase vypneš.</p>
+      <p class="sub" data-en>Press <kbd>Right Shift</kbd> and turn on what you need. Drag the HUD around, save it as a preset and colour it with a theme. The launcher adds it to Fabric, NeoForge and Forge instances by itself — and one switch turns it off again.</p>
+    </div>
+    <div class="modgrid">
+      <div class="frame cap rv"><img src="img/mod-menu.webp" width="1280" height="720" alt="" loading="lazy"><span data-cs>Menu modulů</span><span data-en>Module menu</span></div>
+      <div class="stack">
+        <div class="frame cap rv"><img src="img/mod-editor.webp" width="1280" height="720" alt="" loading="lazy"><span data-cs>Karty si přetáhneš, kam chceš</span><span data-en>Drag cards wherever you like</span></div>
+        <div class="frame cap rv"><img src="img/mod-hud.webp" width="1280" height="720" alt="" loading="lazy"><span data-cs>Nastavení každého modulu</span><span data-en>Settings for every module</span></div>
+      </div>
+    </div>
+    <div class="chips rv">
+      <span class="chip r">FPS</span><span class="chip r">CPS</span><span class="chip r">Ping</span><span class="chip r">Keystrokes</span>
+      <span class="chip"><span data-cs>Souřadnice</span><span data-en>Coordinates</span></span>
+      <span class="chip"><span data-cs>Brnění</span><span data-en>Armor</span></span>
+      <span class="chip"><span data-cs>Efekty</span><span data-en>Effects</span></span>
+      <span class="chip">K/D</span><span class="chip">Zoom</span><span class="chip">Freelook</span>
+      <span class="chip"><span data-cs>Zaměřovač</span><span data-en>Crosshair</span></span>
+      <span class="chip"><span data-cs>Čisté HUD</span><span data-en>Clean HUD</span></span>
+      <span class="chip"><span data-cs>Čas a počasí</span><span data-en>Time & weather</span></span>
+      <span class="chip"><span data-cs>Motivy</span><span data-en>Themes</span></span>
+      <span class="chip"><span data-cs>HUD presety</span><span data-en>HUD presets</span></span>
+      <span class="chip"><span data-cs>Vanilla mód</span><span data-en>Vanilla mode</span></span>
+      <span class="chip r"><span data-cs>Přátelé a chat</span><span data-en>Friends & chat</span></span>
+      <span class="chip r">Now Playing</span>
+    </div>
+    <div class="vers rv"><span data-cs>Funguje na</span><span data-en>Works on</span> <code>1.21.10</code><code>1.21.11</code><code>26.1</code><code>26.2</code><code>26.3</code> · Fabric, NeoForge, Forge</div>
+  </section>
+
+  <!-- ============ FRIENDS ============ -->
+  <section class="block" id="friends">
+    <div class="split rev">
+      <div class="rv">
+        <span class="kicker" data-cs>Přátelé a sdílení světů</span><span class="kicker" data-en>Friends & world sharing</span>
+        <h2 data-cs>Hraj s kámoši <em>bez serveru</em>.</h2>
+        <h2 data-en>Play with friends, <em>no server needed</em>.</h2>
+        <p class="sub" data-cs>Přidej si kamarády podle Minecraft jména, piš si s nimi v launcheru i ve hře a pozvi je do svého singleplayer světa jedním klikem.</p>
+        <p class="sub" data-en>Add friends by their Minecraft name, chat in the launcher and in game, and invite them into your singleplayer world with one click.</p>
+        <ul class="feats">
+          <li><span class="fi"><svg class="i"><use href="#i-chat"/></svg></span><div>
+            <b data-cs>Chat všude</b><b data-en>Chat everywhere</b>
+            <p data-cs>V launcheru, v hlavním menu i ve hře (klávesa <kbd>U</kbd>) s upozorněním na nové zprávy.</p>
+            <p data-en>In the launcher, on the title screen and in game (<kbd>U</kbd> key) with toasts for new messages.</p></div></li>
+          <li><span class="fi"><svg class="i"><use href="#i-globe"/></svg></span><div>
+            <b data-cs>Sdílení světů jako Essential</b><b data-en>World sharing like Essential</b>
+            <p data-cs>Svět běží u tebe na počítači, kamarádi se připojí přes naši relay — žádné porty ani hosting.</p>
+            <p data-en>The world runs on your PC, friends join through our relay — no ports, no hosting.</p></div></li>
+          <li><span class="fi"><svg class="i"><use href="#i-share"/></svg></span><div>
+            <b data-cs>Posílej klipy a modpacky</b><b data-en>Send clips and modpacks</b>
+            <p data-cs>Modpack se kamarádovi nainstaluje jedním tlačítkem přímo z chatu.</p>
+            <p data-en>A modpack installs for your friend with one button right from the chat.</p></div></li>
+          <li><span class="fi"><svg class="i"><use href="#i-trophy"/></svg></span><div>
+            <b data-cs>Profil, odznaky a achievementy</b><b data-en>Profile, badges and achievements</b>
+            <p data-cs>Status, statistiky odehraného času a co zrovna kdo hraje.</p>
+            <p data-en>Status, playtime stats and what everyone is playing right now.</p></div></li>
+        </ul>
+      </div>
+      <div class="rv">
+        <div class="frame"><img src="img/launcher-friends.webp" width="1416" height="808" alt="" loading="lazy"></div>
+        <div class="flow">
+          <div class="n"><b data-cs>Ty</b><b data-en>You</b><span data-cs>otevřeš svět</span><span data-en>open your world</span></div>
+          <svg class="i ar"><use href="#i-arrow"/></svg>
+          <div class="n"><b>Justice relay</b><span data-cs>šifrované WSS</span><span data-en>encrypted WSS</span></div>
+          <svg class="i ar"><use href="#i-arrow"/></svg>
+          <div class="n"><b data-cs>Kamarád</b><b data-en>Friend</b><span data-cs>klikne Připojit</span><span data-en>clicks Join</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CLIPS ============ -->
+  <section class="block" id="clips">
+    <div class="split">
+      <div class="rv">
+        <span class="kicker" data-cs>Clips a natáčení</span><span class="kicker" data-en>Clips & recording</span>
+        <h2 data-cs>Ten moment už <em>neuteče</em>.</h2>
+        <h2 data-en>Never miss <em>that moment</em> again.</h2>
+        <p class="sub" data-cs>Justice Clips nahrává poslední vteřiny hry do paměti. Když se stane něco epického, zmáčkneš klávesu a klip je na disku — jako Medal, ale přímo v launcheru.</p>
+        <p class="sub" data-en>Justice Clips keeps the last seconds of gameplay in memory. When something epic happens, press a key and the clip is on disk — like Medal, but built into the launcher.</p>
+        <div class="hotkey">
+          <span class="k">F8</span>
+          <p><span class="rec" data-cs>Nahrává jen když hraješ</span><span class="rec" data-en>Records only while you play</span><br>
+            <span data-cs><b>Posledních až 5 minut</b> v 60 FPS, uložené podle hry do složek.</span>
+            <span data-en><b>Up to the last 5 minutes</b> at 60 FPS, sorted into folders by game.</span></p>
+        </div>
+        <ul class="feats">
+          <li><span class="fi"><svg class="i"><use href="#i-cpu"/></svg></span><div>
+            <b data-cs>Skoro žádný dopad na FPS</b><b data-en>Almost no FPS impact</b>
+            <p data-cs>Kóduje grafika — na Windows NVIDIA NVENC, na Linuxu gpu-screen-recorder.</p>
+            <p data-en>The GPU does the encoding — NVIDIA NVENC on Windows, gpu-screen-recorder on Linux.</p></div></li>
+          <li><span class="fi"><svg class="i"><use href="#i-mic"/></svg></span><div>
+            <b data-cs>Zvuk na samostatných stopách</b><b data-en>Audio on separate tracks</b>
+            <p data-cs>Hra a mikrofon zvlášť, takže je ve střižně snadno vyvážíš.</p>
+            <p data-en>Game and mic separately, so they're easy to balance when editing.</p></div></li>
+          <li><span class="fi"><svg class="i"><use href="#i-share"/></svg></span><div>
+            <b data-cs>Pošli ho kámošům</b><b data-en>Send it to friends</b>
+            <p data-cs>Klip sdílíš do chatu jedním klikem, bez nahrávání na YouTube.</p>
+            <p data-en>Share a clip to chat with one click, no YouTube upload needed.</p></div></li>
+        </ul>
+      </div>
+      <div class="rv"><div class="frame"><img src="img/launcher-clips.webp" width="1416" height="808" alt="" loading="lazy"></div></div>
+    </div>
+  </section>
+
+  <!-- ============ SERVERS ============ -->
+  <section class="block" id="servers">
+    <div class="head center rv">
+      <span class="kicker" data-cs>Naše servery</span><span class="kicker" data-en>Our servers</span>
+      <h2 data-cs>Připoj se <em>jedním klikem</em>.</h2>
+      <h2 data-en>Join with <em>one click</em>.</h2>
+      <p class="sub" data-cs>Justice SMP a Ertenix máš v launcheru nahoře — vidíš počet hráčů a hned hraješ.</p>
+      <p class="sub" data-en>Justice SMP and Ertenix sit at the top of the launcher — see who's online and jump straight in.</p>
+    </div>
+    <div class="servers">
+      <div class="srv jsmp rv">
+        <h3>Justice SMP</h3>
+        <p data-cs>SMP komunita kolem kanálu maxernMC — survival, eventy a natáčení videí.</p>
+        <p data-en>The SMP community around the maxernMC channel — survival, events and video shoots.</p>
+        <div class="row">
+          <button class="btn ghost ip" data-copy="justicesmp.online"><svg class="i"><use href="#i-copy"/></svg>justicesmp.online</button>
+          <a class="btn ghost" href="https://justicesmp.online/" target="_blank" rel="noopener"><svg class="i"><use href="#i-globe"/></svg><span data-cs>Web</span><span data-en>Website</span></a>
+          <a class="btn ghost" href="https://www.youtube.com/@maxernMC" target="_blank" rel="noopener"><svg class="i"><use href="#i-yt"/></svg>@maxernMC</a>
+        </div>
+      </div>
+      <div class="srv ert rv">
+        <h3>Ertenix</h3>
+        <p data-cs>Český survival server s vlastní ekonomikou, questy, aukcemi a týmy.</p>
+        <p data-en>A Czech survival server with its own economy, quests, auctions and teams.</p>
+        <div class="row">
+          <a class="btn ghost" href="https://ertenix.net" target="_blank" rel="noopener"><svg class="i"><use href="#i-globe"/></svg>ertenix.net</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DOWNLOAD ============ -->
+  <section class="block" id="download">
+    <div class="dlbox rv">
+      <img class="logo" src="icon.png" alt="">
+      <h2 data-cs>Stáhni si <em>Justice Client</em></h2>
+      <h2 data-en>Get <em>Justice Client</em></h2>
+      <p class="sub" style="margin:0 auto" data-cs>Zdarma. Aktualizace pak chodí samy přímo v launcheru.</p>
+      <p class="sub" style="margin:0 auto" data-en>Free. Updates arrive by themselves inside the launcher.</p>
+      <div class="plat">
+        <div>
+          <h4><svg class="i"><use href="#i-win"/></svg>Windows 10 / 11</h4>
+          <p data-cs>Instalačka, 64 bit.</p><p data-en>Installer, 64-bit.</p>
+          <a class="btn red" href="JusticeClient-setup.exe" download><svg class="i"><use href="#i-dl"/></svg>JusticeClient-setup.exe</a>
+        </div>
+        <div id="plat-linux">
+          <h4><svg class="i"><use href="#i-linux"/></svg>Linux</h4>
+          <p data-cs class="lnx-note">Balíček .deb, AppImage nebo balíček pro Arch.</p><p data-en class="lnx-note">A .deb package, an AppImage or an Arch package.</p>
+          <button class="btn ghost" type="button" data-lnx><svg class="i"><use href="#i-dl"/></svg><span data-cs>Vybrat verzi pro Linux</span><span data-en>Choose a Linux build</span></button>
+        </div>
+      </div>
+      <div class="meta" id="ver2">&nbsp;</div>
+
+      <details class="smart">
+        <summary><span data-cs>Windows ukáže modré varování? Je to normální — takhle ho obejdeš</span><span data-en>Windows shows a blue warning? That's normal — here's how to get past it</span></summary>
+        <div>
+          <span data-cs>Justice Client zatím nemá placený podpisový certifikát, takže ho SmartScreen ještě nezná. Aktualizace jsou ale digitálně podepsané — launcher přijme jen verze vydané autorem.</span>
+          <span data-en>Justice Client doesn't have a paid code-signing certificate yet, so SmartScreen doesn't know it. Updates are digitally signed though — the launcher only accepts versions released by the author.</span>
+          <div class="steps">
+            <div class="step">
+              <div class="n">1</div>
+              <div data-cs>Po spuštění instalačky klikni na <b>Další informace</b>.</div>
+              <div data-en>After starting the installer, click <b>More info</b>.</div>
+              <div class="ss">
+                <div class="t" data-cs>Systém Windows ochránil váš počítač</div><div class="t" data-en>Windows protected your PC</div>
+                <div class="m" data-cs>Microsoft Defender SmartScreen zabránil spuštění nerozpoznané aplikace…</div>
+                <div class="m" data-en>Microsoft Defender SmartScreen prevented an unrecognized app from starting…</div>
+                <span class="link" data-cs>Další informace</span><span class="link" data-en>More info</span>
+                <div class="btns"><span class="b" data-cs>Nespouštět</span><span class="b" data-en>Don't run</span></div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="n">2</div>
+              <div data-cs>Objeví se tlačítko <b>Přesto spustit</b> — klikni na něj.</div>
+              <div data-en>A <b>Run anyway</b> button appears — click it.</div>
+              <div class="ss">
+                <div class="t" data-cs>Systém Windows ochránil váš počítač</div><div class="t" data-en>Windows protected your PC</div>
+                <div class="m">App: JusticeClient-setup.exe<br><span data-cs>Vydavatel: Neznámý vydavatel</span><span data-en>Publisher: Unknown publisher</span></div>
+                <div class="btns"><span class="b hl" data-cs>Přesto spustit</span><span class="b hl" data-en>Run anyway</span><span class="b" data-cs>Nespouštět</span><span class="b" data-en>Don't run</span></div>
+              </div>
+            </div>
+            <div class="step">
+              <div class="n">3</div>
+              <div data-cs><b>Prohlížeč blokuje stažení?</b> V Chromu/Edgi otevři stahování (<kbd>Ctrl</kbd>+<kbd>J</kbd>) a u souboru zvol <b>⋯ → Ponechat</b>.</div>
+              <div data-en><b>Browser blocks the download?</b> In Chrome/Edge open downloads (<kbd>Ctrl</kbd>+<kbd>J</kbd>) and choose <b>⋯ → Keep</b> on the file.</div>
+            </div>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <dialog class="lnx" id="lnx" aria-labelledby="lnx-title">
+    <div class="lnx-in">
+      <div class="lnx-head">
+        <div>
+          <h3 id="lnx-title"><span data-cs>Justice Client pro Linux</span><span data-en>Justice Client for Linux</span></h3>
+          <p data-cs>Vyber verzi podle toho, jakou máš distribuci.</p><p data-en>Pick the build that matches your distro.</p>
+        </div>
+        <button class="lnx-x" type="button" data-close aria-label="Close">×</button>
+      </div>
+      <div class="lnx-grid">
+        <div class="lnx-card">
+          <span class="tag">.deb</span>
+          <h4><span data-cs>Balíček Debian</span><span data-en>Debian package</span></h4>
+          <p class="for">Ubuntu, Linux Mint, Debian, Pop!_OS, Zorin OS <span data-cs>apod.</span><span data-en>and similar</span></p>
+          <code>sudo apt install ./justice-client.deb</code>
+          <a class="btn red" href="justice-client.deb" download><svg class="i"><use href="#i-dl"/></svg>justice-client.deb</a>
+        </div>
+        <div class="lnx-card">
+          <span class="tag">AppImage</span>
+          <h4>AppImage</h4>
+          <p class="for"><span data-cs>Jakýkoliv systém — nic se neinstaluje, stačí spustit.</span><span data-en>Any distro — nothing to install, just run it.</span></p>
+          <code>chmod +x JusticeClient.AppImage &amp;&amp; ./JusticeClient.AppImage</code>
+          <a class="btn red" href="JusticeClient.AppImage" download><svg class="i"><use href="#i-dl"/></svg>JusticeClient.AppImage</a>
+        </div>
+        <div class="lnx-card">
+          <span class="tag">Arch</span>
+          <h4><span data-cs>Balíček pro Arch</span><span data-en>Arch package</span></h4>
+          <p class="for"><span data-cs>Distra založená na Archu</span><span data-en>Arch-based distros</span> — Arch, CachyOS, EndeavourOS, Manjaro <span data-cs>apod.</span><span data-en>and similar</span></p>
+          <code>sudo pacman -U justice-client.pkg.tar.zst</code>
+          <a class="btn red" href="justice-client.pkg.tar.zst" download><svg class="i"><use href="#i-dl"/></svg>justice-client.pkg.tar.zst</a>
+        </div>
+      </div>
+      <p class="lnx-foot" data-cs>Klipy na Linuxu nahrávají přes gpu-screen-recorder. Aktualizace ti launcher ohlásí sám — novou verzi pak stáhneš stejně jako teď.</p>
+      <p class="lnx-foot" data-en>Clips on Linux record through gpu-screen-recorder. The launcher tells you when there's an update — then download the new build the same way.</p>
+    </div>
+  </dialog>
+
+  <!-- ============ FAQ ============ -->
+  <section class="block" id="faq">
+    <div class="head center rv">
+      <span class="kicker">FAQ</span>
+      <h2 data-cs>Časté otázky</h2><h2 data-en>Common questions</h2>
+    </div>
+    <div class="faq rv">
+      <details>
+        <summary><span data-cs>Je Justice Client zdarma?</span><span data-en>Is Justice Client free?</span></summary>
+        <div data-cs>Ano, celý launcher i Justice Mod jsou zdarma a bez reklam.</div>
+        <div data-en>Yes, the whole launcher and Justice Mod are free and ad-free.</div>
+      </details>
+      <details>
+        <summary><span data-cs>Potřebuju koupený Minecraft?</span><span data-en>Do I need to own Minecraft?</span></summary>
+        <div data-cs>Na online servery ano: přihlašuješ se účtem Microsoft — launcher tvoje heslo nikdy nevidí, přihlášení probíhá přímo u Microsoftu. Bez koupeného Minecraftu si přidáš <b>offline účet</b> (singleplayer, LAN, sdílené světy a servery bez ověření). Přátelé a chat fungují i s ním, k Justice účtu si jen vytvoříš heslo.</div>
+        <div data-en>For online servers, yes: you sign in with your Microsoft account — the launcher never sees your password, sign-in happens directly with Microsoft. Without owning Minecraft you can add an <b>offline account</b> (singleplayer, LAN, shared worlds and servers without authentication). Friends and chat work with it too — you just set a password for your Justice account.</div>
+      </details>
+      <details>
+        <summary><span data-cs>Je to bezpečné? Proč Windows ukazuje varování?</span><span data-en>Is it safe? Why does Windows show a warning?</span></summary>
+        <div data-cs>Launcher zatím nemá placený certifikát pro podpis kódu, proto ho SmartScreen nezná. Každá aktualizace je ale podepsaná naším klíčem a launcher jinou verzi nepřijme. Postup najdeš <a href="#download" style="color:var(--red)">u stažení</a>.</div>
+        <div data-en>The launcher doesn't have a paid code-signing certificate yet, so SmartScreen doesn't know it. Every update is signed with our key though, and the launcher rejects anything else. See the steps <a href="#download" style="color:var(--red)">under Download</a>.</div>
+      </details>
+      <details>
+        <summary><span data-cs>Můžu hrát na jakémkoliv serveru, třeba Hypixelu?</span><span data-en>Can I play on any server, like Hypixel?</span></summary>
+        <div data-cs>Ano. Justice Mod obsahuje jen HUD a vizuální věci, žádné cheaty. Jako u každého klienta ale dodržuj pravidla konkrétního serveru.</div>
+        <div data-en>Yes. Justice Mod only contains HUD and visual features, no cheats. As with any client, follow the rules of the server you play on.</div>
+      </details>
+      <details>
+        <summary><span data-cs>Na jakých verzích funguje Justice Mod?</span><span data-en>Which versions does Justice Mod support?</span></summary>
+        <div data-cs>Fabric 1.21.10, 1.21.11 a 26.1–26.3. Launcher ho do instance přidá sám; v Nastavení → Customize ho můžeš vypnout. Starší verze a jiné loadery hraješ normálně, jen bez menu.</div>
+        <div data-en>Fabric 1.21.10, 1.21.11 and 26.1–26.3. The launcher adds it for you; you can turn it off in Settings → Customize. Older versions and other loaders work normally, just without the menu.</div>
+      </details>
+      <details>
+        <summary><span data-cs>Jak funguje sdílení světa? Musím otevírat porty?</span><span data-en>How does world sharing work? Do I need to open ports?</span></summary>
+        <div data-cs>Nemusíš. Svět běží u tebe, Justice Mod ho otevře a launcher ho přes naši relay bezpečně přepošle pozvaným kamarádům. Stačí, aby oba měli Justice Client.</div>
+        <div data-en>No. The world runs on your PC, Justice Mod opens it and the launcher securely forwards it through our relay to invited friends. Both of you just need Justice Client.</div>
+      </details>
+      <details>
+        <summary><span data-cs>Můžu si přenést modpack z jiného launcheru?</span><span data-en>Can I bring a modpack from another launcher?</span></summary>
+        <div data-cs>Ano — import podporuje Modrinth <code>.mrpack</code>, CurseForge zip i <code>.dawnpack</code>.</div>
+        <div data-en>Yes — import supports Modrinth <code>.mrpack</code>, CurseForge zip and <code>.dawnpack</code>.</div>
+      </details>
+      <details>
+        <summary><span data-cs>Funguje to na Linuxu nebo Macu?</span><span data-en>Does it work on Linux or Mac?</span></summary>
+        <div data-cs>Na Linuxu ano — je balíček .deb (Ubuntu, Mint, Debian…), AppImage pro jakékoliv distro a balíček pro Arch (<a href="#download" style="color:var(--red)">u stažení</a>). Klipy nahrávají přes gpu-screen-recorder. Mac zatím podporovaný není.</div>
+        <div data-en>On Linux yes — there's a .deb (Ubuntu, Mint, Debian…), an AppImage for any distro and an Arch package (<a href="#download" style="color:var(--red)">under Download</a>). Clips record through gpu-screen-recorder. Mac isn't supported yet.</div>
+      </details>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="col" style="max-width:300px">
+      <a class="brand" href="#top"><img src="icon.png" alt="">Justice <b>Client</b></a>
+      <span data-cs>Minecraft launcher pro hraní i natáčení.</span><span data-en>A Minecraft launcher for playing and recording.</span>
+    </div>
+    <span class="sp"></span>
+    <div class="col"><b data-cs>Launcher</b><b data-en>Launcher</b>
+      <a href="#launcher" data-cs>Instance</a><a href="#launcher" data-en>Instances</a>
+      <a href="#music" data-cs>Hudba</a><a href="#music" data-en>Music</a>
+      <a href="#mod">Justice Mod</a>
+      <a href="#friends" data-cs>Přátelé</a><a href="#friends" data-en>Friends</a>
+      <a href="#clips">Clips</a>
+    </div>
+    <div class="col"><b data-cs>Komunita</b><b data-en>Community</b>
+      <a href="https://www.youtube.com/@maxernMC" target="_blank" rel="noopener">YouTube @maxernMC</a>
+      <a href="#servers">Justice SMP</a>
+      <a href="https://ertenix.net" target="_blank" rel="noopener">Ertenix</a>
+    </div>
+    <div class="col"><b data-cs>Podpora</b><b data-en>Support</b>
+      <a href="#faq">FAQ</a>
+      <a href="#download" data-cs>Stáhnout</a><a href="#download" data-en>Download</a>
+    </div>
+    <div class="legal">© 2026 Justice Client · <span data-cs>Není oficiální produkt Minecraftu. Není schváleno ani spojeno s Mojang nebo Microsoftem.</span><span data-en>Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.</span></div>
+  </div>
+</footer>
+
+<script>
+
+  const html = document.documentElement, btn = document.getElementById("lang");
+  const caps = {
+    cs: ["Nejnovější verze Minecraftu s oficiálními obrázky, hraješ jedním klikem. Pod tím instance a hudba.", "Karty s obrázkem posledního serveru nebo světa a filtry podle loaderu.", "Modrinth a CurseForge: mody, modpacky, shadery a resource packy s doporučenými mody.", "Počet hráčů, ping a MOTD, připojení s vybranou instancí.", "5 motivů, vlastní barva, pozadí a navigace v nastavení."],
+    en: ["The newest Minecraft versions with their official art, play in one click. Your instances and music below.", "Cards with a picture of your last server or world, and loader filters.", "Modrinth and CurseForge: mods, modpacks, shaders and resource packs with picks.", "Player count, ping and MOTD, join with the instance you chose.", "5 themes, your own colour, background and a settings sidebar."],
+  };
+  let tab = 0;
+  const setLang = (l) => {
+    html.lang = l; btn.textContent = l === "en" ? "CZ" : "EN";
+    document.getElementById("lcap").textContent = caps[l][tab];
+    try { localStorage.setItem("jc-lang", l); } catch (e) {}
+  };
+  let saved = null; try { saved = localStorage.getItem("jc-lang"); } catch (e) {}
+  const nav = navigator.language || "";
+  const qlang = new URLSearchParams(location.search).get("lang");
+  setLang((qlang === "en" || qlang === "cs" ? qlang : null) || saved || (nav && !nav.startsWith("cs") && !nav.startsWith("sk") ? "en" : "cs"));
+  btn.onclick = () => setLang(html.lang === "en" ? "cs" : "en");
+
+  // launcher tabs
+  const tabs = [...document.querySelectorAll("#ltabs .tab")], imgs = [...document.querySelectorAll("#lview img")];
+  tabs.forEach(t => t.onclick = () => {
+    tab = +t.dataset.i;
+    tabs.forEach(x => x.classList.toggle("on", x === t));
+    imgs.forEach((im, i) => im.classList.toggle("on", i === tab));
+    document.getElementById("lcap").textContent = caps[html.lang][tab];
+  });
+
+  // copy server IP
+  document.querySelectorAll("[data-copy]").forEach(b => b.onclick = () => {
+    navigator.clipboard?.writeText(b.dataset.copy).then(() => {
+      b.classList.add("copied"); setTimeout(() => b.classList.remove("copied"), 1400);
+    });
+  });
+
+  // nav border + scroll reveal
+  const navEl = document.getElementById("nav");
+  addEventListener("scroll", () => navEl.classList.toggle("scrolled", scrollY > 10), { passive: true });
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -8% 0px" });
+    document.querySelectorAll(".rv").forEach(el => io.observe(el));
+  } else document.querySelectorAll(".rv").forEach(el => el.classList.add("in"));
+
+  // Download button for the visitor's system: Windows gets the installer, Linux the build picker,
+  // anything else (Mac, phones) the download section.
+  const lnx = document.getElementById("lnx");
+  const openLinux = (e) => { if (e) e.preventDefault(); if (lnx.showModal) lnx.showModal(); else lnx.setAttribute("open", ""); };
+  lnx.addEventListener("click", e => { if (e.target === lnx || e.target.closest("[data-close]")) lnx.close(); });
+  document.querySelectorAll("[data-lnx]").forEach(b => b.onclick = openLinux);
+  const plat = ((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "") + " " + navigator.userAgent;
+  const os = /Android|iPhone|iPad/i.test(plat) ? "other" : /Win/i.test(plat) ? "win" : /Linux|X11|CrOS/i.test(plat) ? "linux" : "other";
+  const main = document.getElementById("dl-main");
+  if (os === "linux") {
+    main.removeAttribute("download");
+    main.href = "#download";
+    main.innerHTML = '<svg class="i"><use href="#i-linux"/></svg><span data-cs>Stáhnout pro Linux</span><span data-en>Download for Linux</span>';
+    main.onclick = openLinux;
+    document.getElementById("plat-linux").style.order = "-1";
+  } else if (os === "other") {
+    main.removeAttribute("download");
+    main.href = "#download";
+    main.innerHTML = '<svg class="i"><use href="#i-dl"/></svg><span data-cs>Stáhnout</span><span data-en>Download</span>';
+  }
+  if (location.hash === "#linux") openLinux();
+
+  fetch("latest.json", { cache: "no-store" }).then(r => r.json()).then(j => {
+    const d = new Date(j.pub_date);
+    const t = `v${j.version} · ${d.toLocaleDateString(html.lang === "en" ? "en-GB" : "cs-CZ")}`;
+    document.getElementById("ver").textContent = t;
+    document.getElementById("ver2").textContent = t;
+    document.getElementById("pillver").textContent = `v${j.version}`;
+  }).catch(() => {});
+</script>
+<script>
+  // Benchmark bars grow when they come into view.
+  (() => {
+    const bars = document.querySelectorAll(".bar2 i[data-w]");
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.style.width = e.target.dataset.w + "%"; io.unobserve(e.target); } }), { threshold: .4 });
+    bars.forEach((b) => io.observe(b));
+  })();
+</script>
+</body>
+</html>

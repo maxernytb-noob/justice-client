@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Justice Client
+GenericName=Minecraft Launcher
+Comment=Minecraft launcher pro natáčení — Flashback, max FPS, Modrinth a CurseForge
+Exec=justice-client
+Icon=justice-client
+Terminal=false
+Categories=Game;
+Keywords=minecraft;launcher;modrinth;curseforge;flashback;
+StartupWMClass=justice-client

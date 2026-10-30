@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pravidla obsahu · Justice Client</title>
+<link rel="icon" href="icon.png">
+<style>
+:root{--bg:#060607;--bg2:#0b0b0d;--panel:#111114;--panel2:#16161a;--line:#222228;--line2:#2d2d35;--text:#f1f0f3;--text2:#a6a4ad;--text3:#6d6b75;--red:#e11d38;--red2:#c8102e;--reddim:#2a0a10}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.7 "Segoe UI",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:420px;background:radial-gradient(600px 300px at 20% -10%,rgba(225,29,56,.16),transparent 70%);pointer-events:none}
+a{color:#ff5a72;text-decoration:none}a:hover{text-decoration:underline}
+header{position:sticky;top:0;z-index:5;background:rgba(6,6,7,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.bar{max-width:1180px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;color:var(--text);font:800 17px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em}
+.brand i{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--red),var(--red2));display:grid;place-items:center;font-style:normal;font-size:15px;box-shadow:0 0 18px rgba(225,29,56,.35)}
+.brand:hover{text-decoration:none}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+.tabs a{color:var(--text2);padding:7px 12px;border-radius:999px;font-size:14px}
+.tabs a:hover{color:var(--text);background:var(--panel2);text-decoration:none}
+.tabs a[aria-current]{color:var(--text);background:var(--reddim);box-shadow:inset 0 0 0 1px rgba(225,29,56,.45)}
+.lang{display:flex;background:var(--panel);border:1px solid var(--line2);border-radius:999px;padding:3px}
+.lang button{all:unset;cursor:pointer;padding:4px 12px;border-radius:999px;font:600 12.5px/1.4 ui-monospace,Consolas,monospace;color:var(--text3)}
+.lang button[aria-pressed=true]{background:var(--red);color:#fff}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 16px 80px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;position:relative}
+.toc{position:sticky;top:84px;align-self:start;max-height:calc(100vh - 110px);overflow:auto;font-size:13.5px;line-height:1.45;display:flex;flex-direction:column;gap:2px}
+.toc b{font:600 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin:4px 0 10px}
+.toc a{color:var(--text2);padding:5px 10px;border-left:2px solid var(--line)}
+.toc a:hover{color:var(--text);border-color:var(--red);text-decoration:none}
+article{max-width:780px;min-width:0}
+h1{font-size:clamp(30px,5vw,44px);line-height:1.15;margin:0 0 18px;letter-spacing:-.02em}
+h2{font-size:22px;margin:44px 0 12px;padding-top:20px;border-top:1px solid var(--line)}
+h3{font-size:17px;margin:28px 0 8px;color:var(--text)}
+p,li{color:#d6d4db}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}li{margin:4px 0}li::marker{color:var(--red)}
+strong{color:var(--text)}
+code{font:13px ui-monospace,Consolas,monospace;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.meta{color:var(--text3);font-size:14px}.meta strong{color:var(--text2)}
+.note{background:linear-gradient(180deg,rgba(225,29,56,.10),rgba(225,29,56,.04));border:1px solid rgba(225,29,56,.35);border-radius:14px;padding:14px 18px;margin:0 0 18px;font-size:14.5px;color:#e9c9cf}
+.note strong{color:#fff}
+mark.todo{background:rgba(250,204,21,.14);color:#fde68a;border:1px dashed rgba(250,204,21,.5);border-radius:6px;padding:0 5px;font-weight:600}
+.table{overflow-x:auto;margin:6px 0 20px;border:1px solid var(--line);border-radius:14px;background:var(--bg2)}
+table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5}
+th{text-align:left;font:600 11.5px/1.3 ui-monospace,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);background:var(--panel);padding:11px 14px;border-bottom:1px solid var(--line)}
+td{padding:11px 14px;border-top:1px solid var(--line);vertical-align:top;color:#d6d4db}
+tr:first-child td{border-top:0}
+footer{border-top:1px solid var(--line);color:var(--text3);font-size:13px;text-align:center;padding:28px 16px}
+html[data-lang=cs] [data-lang=en],html[data-lang=en] [data-lang=cs]{display:none!important}
+@media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding-top:28px}.toc{display:none!important}}
+@media (max-width:640px){
+ .tabs{order:3;flex-basis:100%}
+ .table{border:0;background:none}
+ table,tbody,tr,td{display:block}thead{display:none}
+ tr{border:1px solid var(--line);border-radius:12px;background:var(--bg2);margin-bottom:10px;padding:6px 0}
+ td{border:0;padding:6px 14px}
+ td::before{content:attr(data-h);display:block;font:600 10.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}
+}
+@media print{header,.toc,footer{display:none}body{background:#fff;color:#000}body::before{display:none}p,li,td{color:#000}.wrap{display:block}}
+</style>
+<script>
+(function(){var l;try{l=new URLSearchParams(location.search).get("lang")||localStorage.getItem("jc-lang")}catch(e){}
+if(l!=="en"&&l!=="cs")l=(navigator.language||"cs").slice(0,2)==="cs"||(navigator.language||"").slice(0,2)==="sk"?"cs":"en";
+document.documentElement.dataset.lang=l;document.documentElement.lang=l;})();
+</script>
+</head>
+<body>
+<header><div class="bar">
+<a class="brand" href="https://justiceclient.online/"><i>J</i>JUSTICE</a>
+<nav class="tabs"><a href="terms.html"><span data-lang="cs">Podmínky použití</span><span data-lang="en">Terms of Use</span></a><a href="privacy.html"><span data-lang="cs">Ochrana soukromí</span><span data-lang="en">Privacy</span></a><a href="content-policy.html" aria-current="page"><span data-lang="cs">Pravidla obsahu</span><span data-lang="en">Content Policy</span></a></nav>
+<div class="lang" role="group" aria-label="Language"><button data-set="cs">CZ</button><button data-set="en">EN</button></div>
+</div></header>
+<main class="wrap"><nav class="toc" data-lang="cs"><b>Obsah</b><a href="#cs-1-co-je-zakázáno-vždy">1. Co je zakázáno vždy</a><a href="#cs-2-klipy">2. Klipy</a><a href="#cs-3-chat">3. Chat</a><a href="#cs-4-profil-jména-a-skiny">4. Profil, jména a skiny</a><a href="#cs-5-pomocník-s-ai">5. Pomocník s AI</a><a href="#cs-6-jak-nahlásit-obsah">6. Jak nahlásit obsah</a><a href="#cs-7-co-následuje-po-nahlášení">7. Co následuje po nahlášení</a><a href="#cs-8-odvolání">8. Odvolání</a><a href="#cs-9-kontakt">9. Kontakt</a></nav><nav class="toc" data-lang="en"><b>Contents</b><a href="#en-1-always-forbidden">1. Always forbidden</a><a href="#en-2-clips">2. Clips</a><a href="#en-3-chat">3. Chat</a><a href="#en-4-profile-names-and-skins">4. Profile, names and skins</a><a href="#en-5-ai-helper">5. AI helper</a><a href="#en-6-how-to-report-content">6. How to report content</a><a href="#en-7-what-happens-after-a-report">7. What happens after a report</a><a href="#en-8-appeals">8. Appeals</a><a href="#en-9-contact">9. Contact</a></nav><article lang="cs" data-lang="cs"><h1>Pravidla obsahu a komunity</h1>
+<aside class="note"><strong>Upozornění k návrhu:</strong> Tento text je návrh připravený bez právní kontroly a není právní radou. Před vydáním ho nechte zkontrolovat advokátem.</aside>
+<p class="meta"><strong>Verze:</strong> 2026-10-29 · <strong>Závazné znění:</strong> české. Tato pravidla jsou součástí <a href="https://justiceclient.online/terms">Podmínek použití</a>.</p>
+<p>Justice má být místo, kde se dobře hraje s kamarády. Pravidla platí pro vše, co v Justice Social vytváříte nebo sdílíte: <strong>zprávy v chatu a soubory v nich, klipy (video, popis, hashtagy, označení hráčů), profil (jméno, bio, status, banner), skiny, názvy sdílených světů a party</strong>.</p>
+<h2 id="cs-1-co-je-zakázáno-vždy">1. Co je zakázáno vždy</h2>
+<ul><li><strong>Nelegální obsah</strong> podle českého práva nebo práva EU – zejména jakýkoli sexuální obsah s nezletilými (okamžitě hlásíme policii), propagace terorismu, podněcování k násilí, výhrůžky, prodej drog či zbraní, podvody.</li><li><strong>Nenávist a diskriminace</strong> – útoky na lidi kvůli původu, národnosti, náboženství, pohlaví, sexuální orientaci, postižení a podobně, včetně symbolů nenávistných hnutí (i postavených v Minecraftu).</li><li><strong>Obtěžování a šikana</strong> – opakované nevyžádané zprávy, urážky, vyhrožování, zveřejňování cizích osobních údajů (doxxing), nahrávky lidí, kteří s tím nesouhlasí, ponižování.</li><li><strong>Sexuální a explicitní obsah</strong>, extrémní násilí a gore.</li><li><strong>Sebepoškozování</strong> – propagace nebo návody. Pokud se někdo ocitl v nouzi, v Česku pomůže Linka bezpečí <strong>116 111</strong> nebo tísňová linka <strong>112</strong>.</li><li><strong>Vydávání se za jiné</strong> – za členy týmu Justice, známé tvůrce, jiné hráče nebo organizace.</li><li><strong>Spam a podvody</strong> – reklama, řetězové zprávy, phishing, falešné odkazy na „free“ účty, škodlivé soubory, obchodování s účty.</li><li><strong>Cheaty</strong> – sdílení, propagace a prodej cheatů, hacked clientů, X-ray packů a jiných nástrojů pro nepovolenou výhodu na serverech, které je zakazují; klipy, jejichž hlavním obsahem je propagace cheatování.</li><li><strong>Porušování autorských práv</strong> – cizí videa, hudba nebo mody nahrané bez svolení, vydávání cizí práce za vlastní.</li></ul>
+<h2 id="cs-2-klipy">2. Klipy</h2>
+<ul><li>Klip musí pocházet z vaší hry nebo k němu musíte mít svolení autora.</li><li><strong>Hudba</strong>: nepoužívejte hudbu, ke které nemáte práva. Hudbu z přehrávače, která hraje na pozadí, do klipu raději nenahrávejte.</li><li><strong>Ostatní hráči</strong>: pokud je v klipu slyšet hlas jiného hráče nebo je klip o něm, mějte jeho souhlas. Každý, kdo je v klipu označen, může označení odebrat a požádat o odstranění klipu, pokud ho klip zesměšňuje nebo poškozuje.</li><li><strong>Popis a hashtagy</strong> musí odpovídat obsahu. Zakázáno je zneužívat oblíbené hashtagy ke spamu a označovat hráče, kteří v klipu nejsou.</li><li><strong>Lajky</strong> nesmíte uměle navyšovat (více účtů, boti, výměna lajků).</li><li>Klipy z jiných serverů musí respektovat pravidla daného serveru (např. nezveřejňovat neohlášený obsah, pokud to server zakazuje).</li></ul>
+<h2 id="cs-3-chat">3. Chat</h2>
+<ul><li>Chat je soukromý mezi vámi a přáteli, ale pravidla v něm platí také. Obsah zpráv nesledujeme; řešíme je na základě nahlášení.</li><li>Neposílejte hesla, přihlašovací kódy ani platební údaje – tým Justice se vás na ně <strong>nikdy</strong> nezeptá.</li><li>Pozvánky do party a světů neposílejte opakovaně lidem, kteří o ně nestojí.</li></ul>
+<h2 id="cs-4-profil-jména-a-skiny">4. Profil, jména a skiny</h2>
+<ul><li>Jméno, bio, status, banner a skin nesmí obsahovat nic ze seznamu v bodě 1.</li><li>Offline jména nesmí napodobovat jiné hráče ani tým Justice.</li><li>Pláště Justice jsou jen pro hru v Justice; nesmíte je vydávat za oficiální pláště Mojangu.</li></ul>
+<h2 id="cs-5-pomocník-s-ai">5. Pomocník s AI</h2>
+<ul><li>Nežádejte po pomocníkovi nelegální nebo škodlivý obsah a nesnažte se obejít jeho omezení.</li><li>Nevkládejte do dotazů osobní údaje.</li></ul>
+<h2 id="cs-6-jak-nahlásit-obsah">6. Jak nahlásit obsah</h2>
+<ol><li>U zprávy, klipu nebo profilu použijte v launcheru tlačítko <strong>Nahlásit</strong> (kde je dostupné), nebo napište na <strong><mark class="todo">[DOPLNIT: e-mail pro nahlašování]</mark></strong>.</li><li>Uveďte, <strong>co</strong> nahlašujete (odkaz na klip, jméno hráče, čas zprávy, snímek obrazovky), <strong>proč</strong> to podle vás porušuje zákon nebo tato pravidla, a své <strong>jméno a e-mail</strong> (u obsahu se zneužíváním dětí nejsou nutné).</li><li>Připojte prohlášení, že nahlášení podáváte v dobré víře a údaje jsou podle vás přesné a úplné.</li><li>Přijetí potvrdíme a o výsledku vás informujeme. Nahlášení posuzuje člověk.</li></ol>
+<p>Nahlásit můžete obsah i v případě, že vás porušuje autorská práva – připojte doklad o tom, že práva vlastníte nebo zastupujete jejich držitele.</p>
+<p><strong>Nouzové situace:</strong> pokud někomu hrozí bezprostřední nebezpečí, volejte <strong>112</strong>. Nahlášení u nás nenahrazuje policii.</p>
+<h2 id="cs-7-co-následuje-po-nahlášení">7. Co následuje po nahlášení</h2>
+<p>Podle závažnosti a opakování můžeme:</p>
+<div class="table"><table><thead><tr><th>Porušení</th><th>Typické opatření</th></tr></thead><tbody><tr><td data-h="Porušení">drobné (nevhodný hashtag, jednorázový spam)</td><td data-h="Typické opatření">odstranění obsahu, upozornění</td></tr><tr><td data-h="Porušení">opakované nebo vážnější (obtěžování, cheaty, porušení autorských práv)</td><td data-h="Typické opatření">odstranění obsahu, dočasné omezení chatu nebo zveřejňování klipů (1–30 dní), dočasné pozastavení účtu</td></tr><tr><td data-h="Porušení">velmi závažné (nelegální obsah, výhrůžky, doxxing, opakované obcházení zákazu)</td><td data-h="Typické opatření">trvalé zrušení účtu, případně oznámení orgánům</td></tr></tbody></table></div>
+<p>O každém opatření vůči vašemu obsahu nebo účtu vás informujeme a uvedeme <strong>co jsme udělali, proč, na základě čeho a jak se můžete odvolat</strong> – pokud to není v rozporu se zákonem nebo pokynem orgánu.</p>
+<h2 id="cs-8-odvolání">8. Odvolání</h2>
+<ul><li>Odvolat se můžete <strong>do 6 měsíců</strong> od rozhodnutí e-mailem na <strong><mark class="todo">[DOPLNIT: e-mail pro nahlašování]</mark></strong> s předmětem „Odvolání“. Uveďte, o jaké rozhodnutí jde a proč nesouhlasíte.</li><li>Odvolat se může i oznamovatel, pokud jsme nahlášený obsah neodstranili.</li><li>Odvolání posoudíme znovu a sdělíme vám výsledek bez zbytečného odkladu, zpravidla do 14 dní. Pokud zjistíme, že jsme se mýlili, obsah nebo účet obnovíme.</li><li>Vedle toho se vždy můžete obrátit na soud nebo na Český telekomunikační úřad jako koordinátora digitálních služeb.</li></ul>
+<h2 id="cs-9-kontakt">9. Kontakt</h2>
+<p><strong><mark class="todo">[DOPLNIT: e-mail pro nahlašování]</mark></strong> · obecný kontakt <strong><mark class="todo">[DOPLNIT: kontaktní e-mail]</mark></strong></p></article><article lang="en" data-lang="en"><h1>Content and Community Policy</h1>
+<aside class="note"><strong>Draft notice:</strong> This text is a draft prepared without legal review and is not legal advice. Before release, have it reviewed by a lawyer.</aside>
+<p class="meta"><strong>Version:</strong> 2026-10-29 · <strong>Binding version:</strong> Czech. This policy forms part of the <a href="https://justiceclient.online/terms">Terms of Use</a>.</p>
+<p>Justice should be a place where it's fun to play with friends. These rules apply to everything you create or share in Justice Social: <strong>chat messages and files in them, clips (video, description, hashtags, player tags), profile (name, bio, status, banner), skins, names of shared worlds and parties</strong>.</p>
+<h2 id="en-1-always-forbidden">1. Always forbidden</h2>
+<ul><li><strong>Illegal content</strong> under Czech or EU law – in particular any sexual content involving minors (we report it to the police immediately), promotion of terrorism, incitement to violence, threats, sale of drugs or weapons, fraud.</li><li><strong>Hate and discrimination</strong> – attacks on people because of origin, nationality, religion, sex, sexual orientation, disability and similar, including symbols of hate movements (also when built in Minecraft).</li><li><strong>Harassment and bullying</strong> – repeated unwanted messages, insults, threats, publishing other people's personal data (doxxing), recordings of people who do not consent, humiliation.</li><li><strong>Sexual and explicit content</strong>, extreme violence and gore.</li><li><strong>Self-harm</strong> – promotion or instructions. If someone is in crisis, in Czechia call Linka bezpečí <strong>116 111</strong> or the emergency number <strong>112</strong>.</li><li><strong>Impersonation</strong> – of Justice team members, well-known creators, other players or organisations.</li><li><strong>Spam and scams</strong> – advertising, chain messages, phishing, fake "free account" links, malicious files, account trading.</li><li><strong>Cheats</strong> – sharing, promoting or selling cheats, hacked clients, X-ray packs and other tools for an unfair advantage on servers that forbid them; clips whose main content promotes cheating.</li><li><strong>Copyright infringement</strong> – other people's videos, music or mods uploaded without permission, passing off others' work as your own.</li></ul>
+<h2 id="en-2-clips">2. Clips</h2>
+<ul><li>A clip must come from your own game or you must have the author's permission.</li><li><strong>Music</strong>: do not use music you have no rights to. Preferably do not record background music from your player into clips.</li><li><strong>Other players</strong>: if another player's voice can be heard in the clip or the clip is about them, get their consent. Anyone tagged in a clip can remove the tag and ask for the clip to be removed if it mocks or harms them.</li><li><strong>Descriptions and hashtags</strong> must match the content. Abusing popular hashtags for spam and tagging players who are not in the clip is forbidden.</li><li><strong>Likes</strong> must not be inflated artificially (multiple accounts, bots, like-for-like).</li><li>Clips from other servers must respect that server's rules (e.g. do not publish unannounced content if the server forbids it).</li></ul>
+<h2 id="en-3-chat">3. Chat</h2>
+<ul><li>Chat is private between you and your friends, but the rules apply there too. We do not monitor message content; we act on reports.</li><li>Do not send passwords, sign-in codes or payment details – the Justice team will <strong>never</strong> ask you for them.</li><li>Do not repeatedly send party or world invitations to people who don't want them.</li></ul>
+<h2 id="en-4-profile-names-and-skins">4. Profile, names and skins</h2>
+<ul><li>Name, bio, status, banner and skin must not contain anything from the list in section 1.</li><li>Offline names must not imitate other players or the Justice team.</li><li>Justice capes are for play within Justice only; you must not pass them off as official Mojang capes.</li></ul>
+<h2 id="en-5-ai-helper">5. AI helper</h2>
+<ul><li>Do not ask the helper for illegal or harmful content and do not try to circumvent its restrictions.</li><li>Do not put personal data into your questions.</li></ul>
+<h2 id="en-6-how-to-report-content">6. How to report content</h2>
+<ol><li>Use the <strong>Report</strong> button in the launcher on a message, clip or profile (where available), or write to <strong><mark class="todo">[DOPLNIT: reporting e-mail]</mark></strong>.</li><li>Say <strong>what</strong> you are reporting (link to the clip, player name, time of the message, screenshot), <strong>why</strong> you believe it breaks the law or these rules, and your <strong>name and e-mail</strong> (not required for child sexual abuse content).</li><li>Add a statement that you submit the report in good faith and that you believe the information is accurate and complete.</li><li>We will confirm receipt and tell you the outcome. Reports are reviewed by a human.</li></ol>
+<p>You can also report content that infringes your copyright – attach evidence that you own the rights or represent the rights holder.</p>
+<p><strong>Emergencies:</strong> if someone is in immediate danger, call <strong>112</strong>. A report to us does not replace the police.</p>
+<h2 id="en-7-what-happens-after-a-report">7. What happens after a report</h2>
+<p>Depending on seriousness and repetition we may:</p>
+<div class="table"><table><thead><tr><th>Violation</th><th>Typical measure</th></tr></thead><tbody><tr><td data-h="Violation">minor (inappropriate hashtag, one-off spam)</td><td data-h="Typical measure">removal of content, warning</td></tr><tr><td data-h="Violation">repeated or more serious (harassment, cheats, copyright infringement)</td><td data-h="Typical measure">removal of content, temporary restriction of chat or clip publishing (1–30 days), temporary account suspension</td></tr><tr><td data-h="Violation">very serious (illegal content, threats, doxxing, repeated ban evasion)</td><td data-h="Typical measure">permanent account closure, possibly reporting to authorities</td></tr></tbody></table></div>
+<p>We will inform you of every measure against your content or account and state <strong>what we did, why, on what basis and how you can appeal</strong> – unless this conflicts with the law or an order of an authority.</p>
+<h2 id="en-8-appeals">8. Appeals</h2>
+<ul><li>You can appeal <strong>within 6 months</strong> of the decision by e-mail to <strong><mark class="todo">[DOPLNIT: reporting e-mail]</mark></strong> with the subject "Appeal". State which decision it concerns and why you disagree.</li><li>A reporter can also appeal if we did not remove the reported content.</li><li>We will review the appeal again and let you know the outcome without undue delay, usually within 14 days. If we find we were wrong, we will restore the content or account.</li><li>In addition, you can always turn to a court or to the Czech Telecommunication Office as Digital Services Coordinator.</li></ul>
+<h2 id="en-9-contact">9. Contact</h2>
+<p><strong><mark class="todo">[DOPLNIT: reporting e-mail]</mark></strong> · general contact <strong><mark class="todo">[DOPLNIT: contact e-mail]</mark></strong></p></article></main>
+<footer><span data-lang="cs">Nejde o oficiální produkt Minecraft. Není schválen společností Mojang ani Microsoft a není s nimi spojen.</span><span data-lang="en">Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.</span></footer>
+<script>
+(function(){var t={cs:"Pravidla obsahu",en:"Content Policy"},r=document.documentElement;
+function set(l,save){r.dataset.lang=l;r.lang=l;document.title=t[l]+" · Justice Client";
+document.querySelectorAll(".lang button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.set===l)});
+if(save)try{localStorage.setItem("jc-lang",l)}catch(e){}}
+document.querySelectorAll(".lang button").forEach(function(b){b.onclick=function(){set(b.dataset.set,1)}});
+set(r.dataset.lang);})();
+</script>
+</body>
+</html>

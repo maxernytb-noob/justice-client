@@ -1,0 +1,6 @@
+# Build environment for the prebuilt Arch package (used by vps-build.sh on the VPS).
+FROM archlinux:latest
+RUN pacman -Syu --noconfirm --needed base-devel rust nodejs npm pkgconf \
+      webkit2gtk-4.1 gtk3 hicolor-icon-theme libglvnd libx11 libxcursor libxrandr libxi alsa-lib gst-plugins-good gst-libav \
+ && pacman -Scc --noconfirm \
+ && useradd -m builder

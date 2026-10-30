@@ -1,0 +1,1308 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Justice Client v2 – návrh</title>
+<style>
+:root {
+  --bg: #050506; --surface: rgba(255,255,255,.035); --surface-2: rgba(255,255,255,.06); --surface-3: rgba(255,255,255,.09);
+  --line: rgba(255,255,255,.07); --line-2: rgba(255,255,255,.12);
+  --text: #f2f1f4; --text-2: #a8a6b0; --text-3: #6e6c76;
+  --accent: #e11d38; --accent-2: #ff4d64; --accent-glow: rgba(225,29,56,.35); --accent-soft: rgba(225,29,56,.14); --on-accent: #fff;
+  --hero-tint: rgba(120,8,24,.55);
+  --radius: 14px; --radius-lg: 20px;
+  color-scheme: dark;
+}
+[data-theme="midnight"] { --bg:#05070d; --accent:#3b82f6; --accent-2:#60a5fa; --accent-glow:rgba(59,130,246,.35); --accent-soft:rgba(59,130,246,.14); --hero-tint:rgba(10,30,80,.6); }
+[data-theme="aurora"]   { --bg:#04080a; --accent:#14b8a6; --accent-2:#5eead4; --accent-glow:rgba(20,184,166,.35); --accent-soft:rgba(20,184,166,.14); --hero-tint:rgba(40,10,80,.55); --on-accent:#03201c; }
+[data-theme="sakura"]   { --bg:#0a0508; --accent:#ec4899; --accent-2:#f9a8d4; --accent-glow:rgba(236,72,153,.35); --accent-soft:rgba(236,72,153,.14); --hero-tint:rgba(90,10,60,.55); }
+[data-theme="mono"]     { --bg:#0b0b0c; --accent:#e5e5e5; --accent-2:#ffffff; --accent-glow:rgba(255,255,255,.18); --accent-soft:rgba(255,255,255,.08); --hero-tint:rgba(0,0,0,.55); --on-accent:#0b0b0c; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--text); font: 14px/1.5 "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; transition: background .3s; user-select: none; }
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+svg { display: block; }
+
+.app { display: grid; grid-template-columns: 76px 1fr; height: 100%; position: relative; }
+.app::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(900px 500px at 75% -10%, var(--accent-soft), transparent 70%); transition: background .3s; }
+
+/* Sidebar */
+.side { display: flex; flex-direction: column; align-items: center; padding: 18px 0 16px; gap: 6px; position: relative; z-index: 2; }
+.logo { width: 44px; height: 44px; margin-bottom: 16px; filter: drop-shadow(0 8px 18px var(--accent-glow)); }
+.nav { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; color: var(--text-3); position: relative; transition: color .15s, background .15s; }
+.nav:hover { color: var(--text); background: var(--surface-2); }
+.nav.on { color: var(--text); background: var(--surface-3); }
+.nav.on::before { content: ""; position: absolute; left: -15px; top: 13px; bottom: 13px; width: 4px; border-radius: 0 4px 4px 0; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+.nav .tip { position: absolute; left: 58px; white-space: nowrap; background: #17171b; border: 1px solid var(--line-2); padding: 5px 10px; border-radius: 8px; font-size: 12px; opacity: 0; transform: translateX(-4px); transition: .12s; pointer-events: none; }
+.nav:hover .tip { opacity: 1; transform: none; }
+.nav .dot { position: absolute; top: 9px; right: 9px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--bg); }
+.side .spacer { flex: 1; }
+.music-btn.on { color: var(--accent); }
+.eq { display: flex; gap: 2px; align-items: flex-end; height: 16px; }
+.eq i { width: 3px; height: 16px; background: currentColor; border-radius: 2px; transform-origin: bottom; animation: eq 1s infinite ease-in-out; will-change: transform; }
+.eq i:nth-child(2) { animation-delay: -.3s; } .eq i:nth-child(3) { animation-delay: -.6s; } .eq i:nth-child(4) { animation-delay: -.15s; }
+@keyframes eq { 0%,100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
+.me { width: 38px; height: 38px; border-radius: 12px; overflow: hidden; margin-top: 8px; background: linear-gradient(135deg, #7a4b2a, #3a2416); display: grid; place-items: center; font-weight: 800; box-shadow: 0 0 0 2px var(--line-2); position: relative; }
+.me::after { content: ""; position: absolute; right: 3px; bottom: 3px; width: 9px; height: 9px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 2px var(--bg); }
+
+/* Main */
+.main { position: relative; z-index: 1; overflow: auto; padding: 0 28px 120px 8px; }
+.top { height: 64px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 5; margin: 0 -28px 0 -8px; padding: 0 28px 0 8px; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(18px) saturate(1.2); }
+.search { flex: 0 1 380px; height: 38px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); display: flex; align-items: center; gap: 10px; padding: 0 12px; color: var(--text-3); }
+.search kbd { margin-left: auto; font: 11px/1 inherit; padding: 4px 6px; border-radius: 6px; background: var(--surface-2); color: var(--text-2); }
+.top .grow { flex: 1; }
+.pill { height: 32px; padding: 0 12px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-2); }
+.pill b { color: var(--text); font-weight: 600; }
+.win { display: flex; gap: 2px; margin-left: 6px; }
+.win button { width: 34px; height: 30px; border-radius: 8px; display: grid; place-items: center; color: var(--text-3); }
+.win button:hover { background: var(--surface-2); color: var(--text); }
+
+/* Hero */
+.hero { position: relative; height: 380px; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--line); }
+.hero .img { position: absolute; inset: -20px; background: url(../web/img/mod-hud.webp) 62% 72%/cover; filter: blur(4px) saturate(1.1); }
+.hero::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(5,5,6,.96) 0%, rgba(5,5,6,.75) 38%, rgba(5,5,6,.2) 75%), linear-gradient(0deg, var(--bg) 0%, transparent 45%), linear-gradient(180deg, rgba(5,5,6,.85) 0%, transparent 35%), linear-gradient(135deg, var(--hero-tint), transparent 60%); }
+.hero .body { position: absolute; inset: 0; z-index: 1; padding: 40px 44px; display: flex; flex-direction: column; justify-content: flex-end; gap: 14px; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-2); display: flex; align-items: center; gap: 8px; }
+.eyebrow::before { content: ""; width: 18px; height: 2px; background: var(--accent); border-radius: 2px; }
+.hero h1 { margin: 0; font-size: 52px; line-height: 1; letter-spacing: -.03em; font-weight: 800; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { height: 28px; padding: 0 11px; border-radius: 999px; background: rgba(255,255,255,.08); backdrop-filter: blur(10px); border: 1px solid var(--line-2); display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-2); }
+.chip.acc { color: var(--accent-2); border-color: color-mix(in srgb, var(--accent) 40%, transparent); background: var(--accent-soft); }
+.actions { display: flex; gap: 10px; align-items: center; margin-top: 6px; }
+.play { height: 54px; display: flex; border-radius: 16px; overflow: hidden; box-shadow: 0 12px 40px var(--accent-glow); }
+.play .go { background: var(--accent); color: var(--on-accent); padding: 0 34px 0 26px; display: flex; align-items: center; gap: 12px; font-size: 17px; font-weight: 800; letter-spacing: .04em; transition: filter .15s; }
+.play .go:hover { filter: brightness(1.12); }
+.play .ver { background: color-mix(in srgb, var(--accent) 80%, black); color: var(--on-accent); padding: 0 14px; display: flex; align-items: center; gap: 8px; font-weight: 600; border-left: 1px solid rgba(0,0,0,.2); }
+.ghost { height: 54px; padding: 0 18px; border-radius: 16px; background: rgba(255,255,255,.08); backdrop-filter: blur(10px); border: 1px solid var(--line-2); display: flex; align-items: center; gap: 9px; font-weight: 600; }
+.ghost:hover { background: rgba(255,255,255,.13); }
+.hero .friends { position: absolute; z-index: 1; top: 26px; right: 26px; display: flex; align-items: center; gap: 10px; padding: 7px 14px 7px 7px; border-radius: 999px; background: rgba(0,0,0,.4); backdrop-filter: blur(12px); border: 1px solid var(--line-2); font-size: 12.5px; color: var(--text-2); }
+.stack { display: flex; }
+.stack span { width: 26px; height: 26px; border-radius: 50%; margin-left: -8px; border: 2px solid #111; display: grid; place-items: center; font-size: 11px; font-weight: 800; }
+.stack span:first-child { margin-left: 0; }
+
+/* Grid below */
+.grid { display: grid; grid-template-columns: 1fr 340px; gap: 22px; margin-top: 26px; }
+.sec-h { display: flex; align-items: baseline; justify-content: space-between; margin: 0 2px 12px; }
+.sec-h h2 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+.sec-h a { color: var(--text-3); font-size: 12.5px; text-decoration: none; }
+.sec-h a:hover { color: var(--text); }
+.insts { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+.inst { border-radius: var(--radius); overflow: hidden; background: var(--surface); border: 1px solid var(--line); transition: transform .15s, border-color .15s, background .15s; cursor: pointer; position: relative; }
+.inst:hover { transform: translateY(-3px); border-color: var(--line-2); background: var(--surface-2); }
+.inst .art { height: 92px; position: relative; display: grid; place-items: center; font-size: 30px; }
+.inst .art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,.45), transparent 60%); }
+.inst .info { padding: 11px 13px 13px; }
+.inst .name { font-weight: 700; }
+.inst .meta { color: var(--text-3); font-size: 12px; display: flex; gap: 6px; align-items: center; }
+.inst .qp { position: absolute; right: 10px; top: 62px; z-index: 1; width: 40px; height: 40px; border-radius: 12px; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; opacity: 0; transform: translateY(6px); transition: .15s; box-shadow: 0 8px 20px var(--accent-glow); }
+.inst:hover .qp { opacity: 1; transform: none; }
+.inst.new { display: grid; place-items: center; min-height: 160px; color: var(--text-3); border-style: dashed; background: transparent; gap: 6px; }
+.inst.new:hover { color: var(--text); }
+
+.card { border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); padding: 16px; }
+.card + .card { margin-top: 14px; }
+.friend { display: flex; align-items: center; gap: 11px; padding: 8px 6px; border-radius: 10px; }
+.friend:hover { background: var(--surface-2); }
+.av { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; position: relative; flex: none; }
+.av.on::after { content: ""; position: absolute; right: -2px; bottom: -2px; width: 10px; height: 10px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 2px #0c0c0e; }
+.friend .n { font-weight: 600; font-size: 13.5px; }
+.friend .s { font-size: 12px; color: var(--text-3); }
+.friend .s b { color: var(--accent-2); font-weight: 600; }
+.friend .join { margin-left: auto; height: 28px; padding: 0 11px; border-radius: 9px; background: var(--surface-2); font-size: 12px; font-weight: 600; }
+.friend .join:hover { background: var(--accent); color: var(--on-accent); }
+.news .tag { display: inline-flex; height: 22px; padding: 0 8px; border-radius: 6px; background: var(--accent-soft); color: var(--accent-2); font-size: 11px; font-weight: 700; align-items: center; letter-spacing: .04em; }
+.news h3 { margin: 10px 0 6px; font-size: 15px; }
+.news ul { margin: 0; padding-left: 18px; color: var(--text-2); font-size: 13px; }
+.news li { margin: 3px 0; }
+.srv { display: flex; align-items: center; gap: 11px; padding: 8px 6px; border-radius: 10px; }
+.srv:hover { background: var(--surface-2); }
+.srv img, .item .logo-img { width: 34px; height: 34px; border-radius: 9px; object-fit: contain; padding: 4px; background: rgba(255,255,255,.05); border: 1px solid var(--line); flex: none; }
+.item .logo-img { width: 40px; height: 40px; border-radius: 11px; }
+.srv .p { margin-left: auto; font-size: 12px; color: #22c55e; display: flex; align-items: center; gap: 5px; }
+
+/* Music mini player */
+.player { position: fixed; right: 24px; bottom: 22px; z-index: 20; width: 360px; border-radius: 18px; background: rgba(17,17,21,.97); contain: layout paint; border: 1px solid var(--line-2); box-shadow: 0 20px 60px rgba(0,0,0,.55); padding: 12px; }
+.player .row { display: flex; align-items: center; gap: 12px; }
+.player .grip { height: 14px; margin: -6px -6px 4px; display: grid; place-items: center; cursor: grab; border-radius: 10px; }
+.player .grip::before { content: ""; width: 36px; height: 4px; border-radius: 4px; background: var(--line-2); transition: background .15s, width .15s; }
+.player .grip:hover::before { background: var(--text-3); width: 48px; }
+.player .cover { cursor: grab; }
+.player.dragging { transition: none; will-change: transform; cursor: grabbing; }
+.player.dragging .cover { animation: none; }
+.player.dragging .grip, .player.dragging .cover { cursor: grabbing; }
+.player.snap { transition: left .2s ease, top .2s ease; }
+.cover { width: 52px; height: 52px; border-radius: 12px; flex: none; background: linear-gradient(135deg, #f97316, #db2777 55%, #7c3aed); box-shadow: 0 6px 18px rgba(0,0,0,.4); position: relative; overflow: hidden; }
+.cover::after { content: "♪"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 22px; color: rgba(255,255,255,.85); }
+.track { min-width: 0; flex: 1; }
+.track .t { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.track .a { font-size: 12.5px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ctrl { display: flex; gap: 2px; }
+.ctrl button { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; color: var(--text-2); }
+.ctrl button:hover { background: var(--surface-3); color: var(--text); }
+.ctrl .pp { background: var(--text); color: #0b0b0c; border-radius: 50%; }
+.ctrl .pp:hover { background: #fff; color: #000; }
+.bar { margin: 12px 4px 2px; display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.bar .track-line { flex: 1; height: 4px; border-radius: 4px; background: var(--surface-3); position: relative; }
+.bar .track-line i { position: absolute; left: 0; top: 0; bottom: 0; width: 38%; border-radius: 4px; background: var(--accent); }
+.bar .track-line i::after { content: ""; position: absolute; right: -5px; top: -3px; width: 10px; height: 10px; border-radius: 50%; background: #fff; }
+.player .tabs { display: flex; gap: 6px; margin-top: 10px; border-top: 1px solid var(--line); padding-top: 10px; }
+.player .tabs button { flex: 1; height: 30px; border-radius: 9px; font-size: 12px; font-weight: 600; color: var(--text-2); background: var(--surface); display: flex; align-items: center; justify-content: center; gap: 6px; }
+.player .tabs button:hover, .player .tabs button.on { background: var(--surface-3); color: var(--text); }
+.lists { margin-top: 8px; display: none; max-height: 200px; overflow: auto; }
+.player.open .lists { display: block; }
+.pl { display: flex; align-items: center; gap: 10px; padding: 7px 6px; border-radius: 10px; cursor: pointer; }
+.pl:hover { background: var(--surface-2); }
+.pl .c { width: 36px; height: 36px; border-radius: 8px; flex: none; }
+.pl .n { font-weight: 600; font-size: 13px; }
+.pl .k { font-size: 11.5px; color: var(--text-3); }
+.pl .go2 { margin-left: auto; color: var(--text-3); }
+.pl:hover .go2 { color: var(--accent-2); }
+.ytm { font-size: 11px; color: var(--text-3); display: flex; align-items: center; gap: 6px; margin: 2px 4px 0; }
+.ytm .live { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; }
+
+/* Pages */
+.page { display: none; animation: pageIn .25s ease; }
+.page.on { display: block; }
+@keyframes pageIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.ph { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin: 10px 0 20px; }
+.ph h1 { margin: 0; font-size: 30px; letter-spacing: -.02em; font-weight: 800; }
+.ph p { margin: 4px 0 0; color: var(--text-3); }
+.btn { height: 38px; padding: 0 16px; border-radius: 11px; background: var(--surface-2); border: 1px solid var(--line); font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: background .15s; }
+.btn:hover { background: var(--surface-3); }
+.btn.acc { background: var(--accent); color: var(--on-accent); border-color: transparent; box-shadow: 0 8px 22px var(--accent-glow); }
+.btn.acc:hover { filter: brightness(1.1); }
+.btn.done { background: rgba(34,197,94,.15); color: #4ade80; border-color: transparent; }
+.seg { display: inline-flex; padding: 4px; gap: 4px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); margin-bottom: 16px; }
+.seg button { height: 30px; padding: 0 14px; border-radius: 9px; font-size: 13px; font-weight: 600; color: var(--text-2); }
+.seg button.on { background: var(--surface-3); color: var(--text); }
+.search input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--text); font: inherit; }
+.search input::placeholder { color: var(--text-3); }
+.search:focus-within { border-color: color-mix(in srgb, var(--accent) 50%, transparent); }
+a[data-go] { cursor: pointer; }
+.sec-h a { cursor: pointer; }
+
+/* Lists */
+.list { display: grid; gap: 10px; }
+.item { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); transition: background .15s, border-color .15s; }
+.item:hover { background: var(--surface-2); border-color: var(--line-2); }
+.item .ic { width: 46px; height: 46px; border-radius: 12px; flex: none; display: grid; place-items: center; font-size: 22px; }
+.item .tx { min-width: 0; flex: 1; }
+.item .tx b { display: block; font-size: 14.5px; }
+.item .tx span { color: var(--text-3); font-size: 12.5px; }
+.tags { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+.tags i { font-style: normal; font-size: 11px; padding: 2px 7px; border-radius: 6px; background: var(--surface-2); color: var(--text-2); }
+
+/* Friends page */
+.fr-wrap { display: grid; grid-template-columns: 300px 1fr; gap: 18px; height: calc(100vh - 250px); min-height: 380px; }
+.fr-list { overflow: auto; }
+.fr-list .friend { cursor: pointer; }
+.fr-list .friend.on { background: var(--surface-3); }
+.chat { display: flex; flex-direction: column; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); overflow: hidden; }
+.chat .head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.chat .msgs { flex: 1; overflow: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.bub { max-width: 70%; padding: 9px 13px; border-radius: 14px; background: var(--surface-2); font-size: 13.5px; }
+.bub.mine { align-self: flex-end; background: var(--accent); color: var(--on-accent); }
+.chat form { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); }
+.chat input { flex: 1; height: 40px; border-radius: 11px; background: var(--surface-2); border: 1px solid var(--line); padding: 0 14px; color: var(--text); outline: 0; font: inherit; user-select: text; }
+.chat input:focus { border-color: color-mix(in srgb, var(--accent) 50%, transparent); }
+
+/* Clips */
+.clips { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.clip { border-radius: var(--radius); overflow: hidden; background: var(--surface); border: 1px solid var(--line); cursor: pointer; transition: transform .15s; }
+.clip:hover { transform: translateY(-3px); }
+.clip .th { aspect-ratio: 16/9; background: url(../web/img/mod-hud.webp) center/cover; position: relative; }
+.clip .th::after { content: "▶"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 26px; color: #fff; background: rgba(0,0,0,.35); opacity: 0; transition: opacity .15s; }
+.clip:hover .th::after { opacity: 1; }
+.clip .th em { position: absolute; right: 8px; bottom: 8px; font-style: normal; font-size: 11px; padding: 2px 6px; border-radius: 6px; background: rgba(0,0,0,.7); z-index: 1; }
+.clip .tx { padding: 10px 12px; }
+.clip .tx b { display: block; font-size: 13.5px; }
+.clip .tx span { font-size: 12px; color: var(--text-3); }
+
+/* Settings */
+.set-grid { display: grid; grid-template-columns: 220px 1fr; gap: 24px; }
+.set-nav { display: flex; flex-direction: column; gap: 4px; }
+.set-nav button { text-align: left; height: 38px; padding: 0 12px; border-radius: 10px; color: var(--text-2); font-weight: 600; }
+.set-nav button.on, .set-nav button:hover { background: var(--surface-2); color: var(--text); }
+.set { display: flex; align-items: center; gap: 16px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+.set:last-child { border-bottom: 0; }
+.set .tx { flex: 1; }
+.set .tx b { display: block; }
+.set .tx span { color: var(--text-3); font-size: 12.5px; }
+.sw { width: 42px; height: 24px; border-radius: 999px; background: var(--surface-3); position: relative; transition: background .2s; flex: none; }
+.sw::after { content: ""; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .2s; }
+.sw.on { background: var(--accent); }
+.sw.on::after { transform: translateX(18px); }
+.swatches { display: flex; gap: 10px; flex-wrap: wrap; }
+.swatch { width: 92px; border-radius: 12px; padding: 8px; background: var(--surface); border: 2px solid transparent; font-size: 12px; font-weight: 600; color: var(--text-2); text-align: left; }
+.swatch .pv { height: 46px; border-radius: 8px; margin-bottom: 6px; position: relative; overflow: hidden; }
+.swatch .pv i { position: absolute; left: 8px; bottom: 8px; width: 34px; height: 9px; border-radius: 4px; }
+.swatch.on { border-color: var(--accent); color: var(--text); }
+input[type=range] { accent-color: var(--accent); width: 220px; }
+.ytm-card { display: flex; align-items: center; gap: 14px; padding: 16px 18px; }
+.ytm-card .logo2 { width: 46px; height: 46px; border-radius: 12px; background: #ff0033; display: grid; place-items: center; color: #fff; font-size: 20px; flex: none; }
+.code { font: 700 22px/1 "Cascadia Mono", Consolas, monospace; letter-spacing: .2em; padding: 10px 14px; border-radius: 10px; background: var(--surface-2); }
+
+/* Menu (version picker) */
+.play { position: relative; overflow: visible; }
+.play .go { border-radius: 16px 0 0 16px; }
+.play .ver { border-radius: 0 16px 16px 0; }
+.menu { position: absolute; left: 0; bottom: 62px; min-width: 260px; border-radius: 14px; background: rgba(20,20,24,.96); backdrop-filter: blur(16px); border: 1px solid var(--line-2); padding: 6px; box-shadow: 0 20px 50px rgba(0,0,0,.6); display: none; z-index: 10; }
+.menu.open { display: block; }
+.menu button { width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 9px; text-align: left; }
+.menu button:hover { background: var(--surface-3); }
+.menu button i { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; font-style: normal; flex: none; }
+.menu button small { display: block; color: var(--text-3); font-size: 11.5px; }
+
+/* Launch overlay on the play button */
+.play.busy .go { pointer-events: none; }
+.play .go .pct { font-variant-numeric: tabular-nums; }
+.play.running .go { background: #16a34a; }
+
+/* Toasts */
+.toasts { position: fixed; top: 74px; right: 24px; z-index: 40; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast { min-width: 260px; max-width: 340px; padding: 11px 14px; border-radius: 12px; background: rgba(22,22,26,.95); backdrop-filter: blur(14px); border: 1px solid var(--line-2); box-shadow: 0 14px 40px rgba(0,0,0,.5); display: flex; gap: 10px; align-items: center; font-size: 13px; animation: toastIn .25s ease; }
+.toast::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; box-shadow: 0 0 10px var(--accent); }
+.toast.out { opacity: 0; transform: translateX(10px); transition: .25s; }
+@keyframes toastIn { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+
+/* Player extras */
+.player.paused .ctrl .pp .pause, .player:not(.paused) .ctrl .pp .playi { display: none; }
+.side .music-btn.paused .eq i { animation-play-state: paused; }
+.track-line { cursor: pointer; }
+.lists .hdr { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: .08em; padding: 4px 6px; }
+.pl.now .n { color: var(--accent-2); }
+.player.hidden { display: none; }
+
+/* ================= Animations ================= */
+:root { --spring: cubic-bezier(.34,1.56,.64,1); --smooth: cubic-bezier(.22,1,.36,1); }
+html { transition: none; }
+body, .app::before, .logo, .nav.on::before, .btn.acc, .play .go, .chip.acc, .sw.on, .track-line i, .toast::before { transition: background .5s var(--smooth), box-shadow .5s var(--smooth), color .3s; }
+
+/* Press feel on everything clickable */
+button, .inst, .clip, .srv, .friend, .pl, .swatch, .item { transition: transform .18s var(--spring), background .15s, border-color .15s, box-shadow .2s, filter .15s; }
+button:active, .inst:active, .clip:active, .srv:active, .pl:active, .swatch:active { transform: scale(.95) !important; transition-duration: .06s; }
+
+/* Ripple */
+.rip { position: absolute; border-radius: 50%; pointer-events: none; background: currentColor; opacity: .25; transform: scale(0); animation: rip .6s var(--smooth) forwards; }
+@keyframes rip { to { transform: scale(1); opacity: 0; } }
+.btn, .go, .ver, .ghost, .join, .nav, .tabs button, .ctrl button, .qp, .seg button, .set-nav button { position: relative; overflow: hidden; }
+
+/* Sidebar: icons bounce, indicator slides */
+.side .nav svg, .side .nav .eq { transition: transform .35s var(--spring); }
+.side .nav:hover svg { transform: scale(1.15) rotate(-6deg); }
+.side .nav.on svg { transform: scale(1.08); }
+.side .nav.on::before { animation: barIn .4s var(--spring); }
+@keyframes barIn { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.logo { animation: logoIn .8s var(--spring) both; }
+.logo:hover { transform: rotate(-8deg) scale(1.08); transition: transform .4s var(--spring); }
+@keyframes logoIn { from { transform: scale(0) rotate(-90deg); } }
+
+@keyframes ping { 0% { box-shadow: 0 0 0 3px var(--bg), 0 0 0 3px var(--accent); } 70%,100% { box-shadow: 0 0 0 3px var(--bg), 0 0 0 10px transparent; } }
+
+/* Pages + staggered children */
+.page.on > * { animation: rise .5s var(--smooth) both; }
+.page.on > *:nth-child(2) { animation-delay: .06s; } .page.on > *:nth-child(3) { animation-delay: .12s; } .page.on > *:nth-child(4) { animation-delay: .18s; }
+.stagger > * { animation: rise .45s var(--smooth) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: none; } }
+
+/* Hero: slow Ken Burns, title swap */
+.hero .img { animation: kb 28s ease-in-out infinite alternate; will-change: transform; }
+@keyframes kb { from { transform: scale(1.02) translate(0,0); } to { transform: scale(1.12) translate(-2%, -2%); } }
+.swap { animation: swap .45s var(--spring); }
+@keyframes swap { from { opacity: 0; transform: translateY(10px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
+
+/* Play button: shine + breathing glow */
+.play .go::after { content: ""; position: absolute; top: 0; bottom: 0; width: 60px; left: 0; background: linear-gradient(100deg, transparent, rgba(255,255,255,.35), transparent); transform: skewX(-20deg); animation: shine 3.5s ease-in-out infinite; }
+@keyframes shine { 0%, 60% { transform: translateX(-90px) skewX(-20deg); } 100% { transform: translateX(260px) skewX(-20deg); } }
+.play::before { content: ""; position: absolute; inset: -6px; border-radius: 20px; box-shadow: 0 0 0 4px var(--accent-soft), 0 12px 50px var(--accent-glow); opacity: 0; animation: breathe 3s ease-in-out infinite; pointer-events: none; will-change: opacity; }
+@keyframes breathe { 50% { opacity: 1; } }
+.play .go:hover svg { transform: scale(1.2); }
+.play .go svg { transition: transform .3s var(--spring); }
+.play .fill { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(255,255,255,.22); transition: width .15s linear; pointer-events: none; }
+.play.running { animation: none; box-shadow: 0 12px 40px rgba(22,163,74,.45); }
+.play.running .go { animation: pop .5s var(--spring); }
+@keyframes pop { 0% { transform: scale(.9); } 100% { transform: none; } }
+.chip { animation: rise .4s var(--smooth) both; }
+.chip:nth-child(2) { animation-delay: .05s; } .chip:nth-child(3) { animation-delay: .1s; } .chip:nth-child(4) { animation-delay: .15s; }
+
+/* Cards: tilt + lift + glow */
+.inst { transform-style: preserve-3d; will-change: transform; }
+.inst:hover { box-shadow: 0 16px 40px rgba(0,0,0,.45), 0 0 0 1px var(--line-2); }
+.inst .art { transition: transform .5s var(--smooth); }
+.inst:hover .art { transform: scale(1.06); }
+.inst .art { overflow: hidden; }
+
+.inst:hover .art { filter: saturate(1.2); }
+.inst .qp { transition: opacity .2s, transform .3s var(--spring); }
+.inst .glare { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.12), transparent 60%); opacity: 0; transition: opacity .2s; z-index: 0; }
+.inst:hover .glare { opacity: 1; }
+
+/* Friends / lists */
+.friend .av { transition: transform .3s var(--spring); }
+.friend:hover .av { transform: scale(1.1) rotate(-4deg); }
+
+@keyframes online { 0% { box-shadow: 0 0 0 2px #0c0c0e, 0 0 0 2px rgba(34,197,94,.6); } 70%,100% { box-shadow: 0 0 0 2px #0c0c0e, 0 0 0 7px rgba(34,197,94,0); } }
+.bub { animation: bub .35s var(--spring) both; transform-origin: left bottom; }
+.bub.me { transform-origin: right bottom; }
+@keyframes bub { from { opacity: 0; transform: scale(.6) translateY(8px); } }
+.btn.done { animation: done .5s var(--spring); }
+@keyframes done { 0% { transform: scale(.8); } 60% { transform: scale(1.08); } 100% { transform: none; } }
+
+/* Switches spring */
+.sw::after { transition: transform .35s var(--spring), width .2s; }
+.sw:active::after { width: 24px; }
+.swatch.on { animation: pop .4s var(--spring); }
+
+/* Toast spring in */
+.toast { animation: toastIn .5s var(--spring); }
+@keyframes toastIn { from { opacity: 0; transform: translateX(40px) scale(.9); } to { opacity: 1; transform: none; } }
+
+/* ===== Music player ===== */
+.player { animation: playerIn .6s var(--spring) backwards; transform-origin: bottom right; }
+@keyframes playerIn { from { opacity: 0; transform: translateY(30px) scale(.9); } }
+.player.hidden { display: block !important; pointer-events: none; animation: playerOut .3s var(--smooth) forwards; }
+@keyframes playerOut { to { opacity: 0; transform: translateY(20px) scale(.92); } }
+
+.cover { transition: transform .4s var(--spring), border-radius .4s; }
+.player:not(.paused) .cover { animation: coverPulse 1.9s ease-in-out infinite; }
+@keyframes coverPulse { 50% { transform: scale(1.05); } }
+.player.paused .cover { transform: scale(.92); filter: grayscale(.4); }
+.track .t, .track .a { display: block; }
+.track.change .t { animation: slideT .45s var(--spring); }
+.track.change .a { animation: slideT .45s .05s var(--spring) both; }
+@keyframes slideT { from { opacity: 0; transform: translateX(18px); } }
+.ctrl .pp { transition: transform .3s var(--spring), background .15s; }
+.ctrl .pp:hover { transform: scale(1.1); }
+.ctrl .pp svg { animation: iconIn .3s var(--spring); }
+@keyframes iconIn { from { transform: scale(0) rotate(-90deg); } }
+.bar .track-line { transition: height .2s var(--smooth); }
+.bar .track-line:hover { height: 7px; }
+.bar .track-line i::after { transform: scale(0); transition: transform .25s var(--spring); }
+.player:hover .bar .track-line i::after { transform: scale(1); }
+
+/* Song list pops out of the player */
+.lists { display: grid !important; grid-template-rows: 0fr; opacity: 0; margin-top: 0; transition: grid-template-rows .45s var(--smooth), opacity .3s, margin-top .3s; max-height: none; overflow: hidden; }
+.lists > .inner { min-height: 0; overflow-x: hidden; overflow-y: auto; max-height: 240px; padding-right: 2px; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.22); background-clip: padding-box; }
+::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-button { display: none; }
+.player.open .lists { grid-template-rows: 1fr; opacity: 1; margin-top: 8px; }
+.player.popping .lists .pl, .player.popping .lists .hdr { animation: popItem .5s var(--spring) both; }
+.player.popping .lists .pl:nth-child(2) { animation-delay: .04s; } .player.popping .lists .pl:nth-child(3) { animation-delay: .08s; }
+.player.popping .lists .pl:nth-child(4) { animation-delay: .12s; } .player.popping .lists .pl:nth-child(5) { animation-delay: .16s; } .player.popping .lists .pl:nth-child(6) { animation-delay: .2s; }
+@keyframes popItem { from { opacity: 0; transform: translateY(16px) scale(.8); } 60% { opacity: 1; } to { transform: none; } }
+.pl .c { transition: transform .3s var(--spring), border-radius .3s; }
+.pl:hover .c { transform: scale(1.12) rotate(-5deg); border-radius: 50%; }
+.pl .go2 { transition: transform .3s var(--spring), color .15s; }
+.pl:hover .go2 { transform: translateX(-3px) scale(1.3); }
+.pl.now .c { animation: spin 6s linear infinite; border-radius: 50%; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.player.open { box-shadow: 0 30px 80px rgba(0,0,0,.65), 0 0 0 1px var(--accent-soft); }
+
+/* Floating notes when a song starts */
+.note { position: fixed; pointer-events: none; z-index: 50; font-size: 18px; color: var(--accent-2); animation: note 1.2s var(--smooth) forwards; }
+@keyframes note { from { opacity: 1; transform: translate(0,0) scale(.6) rotate(0); } to { opacity: 0; transform: translate(var(--dx), -90px) scale(1.3) rotate(var(--rot)); } }
+/* Confetti burst */
+.conf { position: fixed; width: 7px; height: 11px; border-radius: 2px; pointer-events: none; z-index: 60; animation: conf 1s var(--smooth) forwards; }
+@keyframes conf { to { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); } }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+.inst .art { background-size: cover; background-position: center; display: grid; place-items: center; font-size: 30px; }
+.place { position: absolute; left: 8px; bottom: 8px; z-index: 1; max-width: calc(100% - 60px); display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px 0 6px; border-radius: 7px; background: rgba(0,0,0,.6); color: #fff; font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.place img { width: 14px; height: 14px; object-fit: contain; }
+.place svg { flex: none; }
+.place.muted { color: var(--text-3); }
+
+/* ===== Logo easter egg ===== */
+.logo-btn { position: relative; width: 52px; height: 52px; margin-bottom: 12px; display: grid; place-items: center; border-radius: 16px; -webkit-tap-highlight-color: transparent; }
+.logo-btn .logo { margin: 0; width: 44px; height: 44px; transition: transform .35s var(--spring), filter .3s; animation: logoIn .8s var(--spring) both; pointer-events: none; }
+.logo-btn:hover .logo { transform: rotate(-6deg) scale(1.06); }
+.logo-btn:active { transform: none !important; }
+.logo-btn .ring { position: absolute; inset: -2px; width: 56px; height: 56px; transform: rotate(-90deg); pointer-events: none; opacity: 0; transition: opacity .25s; }
+.logo-btn .ring circle { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 170; stroke-dashoffset: 170; transition: stroke-dashoffset .35s var(--spring); filter: drop-shadow(0 0 4px var(--accent)); }
+.logo-btn.counting .ring { opacity: 1; }
+.logo-btn .logo.squish { animation: squish .42s var(--spring); }
+@keyframes squish { 0% { transform: scale(1); } 25% { transform: scale(.78, .7) translateY(3px); } 55% { transform: scale(1.18, 1.12) rotate(-5deg); } 100% { transform: scale(1); } }
+.logo-btn.shake .logo { animation: shake .3s linear infinite; }
+@keyframes shake { 0%,100% { transform: translate(0,0) rotate(0); } 25% { transform: translate(-2px,1px) rotate(-6deg); } 50% { transform: translate(2px,-1px) rotate(5deg); } 75% { transform: translate(-1px,-2px) rotate(-3deg); } }
+.logo-btn .logo.boom { animation: boom .9s var(--spring); }
+@keyframes boom { 0% { transform: scale(.6) rotate(0); filter: drop-shadow(0 0 0 var(--accent)) brightness(1); } 40% { transform: scale(1.55) rotate(200deg); filter: drop-shadow(0 0 22px var(--accent)) brightness(1.5); } 100% { transform: scale(1) rotate(360deg); } }
+.logo-btn .logo.sad { animation: sad 1s var(--smooth); }
+@keyframes sad { 0% { transform: none; } 30% { transform: translateY(6px) rotate(-12deg) scale(.9); filter: grayscale(1); } 70% { transform: translateY(6px) rotate(10deg) scale(.9); filter: grayscale(1); } 100% { transform: none; } }
+.logo-btn .count { position: absolute; top: -8px; right: -10px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--accent); color: var(--on-accent); font-size: 11px; font-weight: 800; display: grid; place-items: center; transform: scale(0); transition: transform .3s var(--spring); pointer-events: none; }
+.logo-btn.counting .count { transform: scale(1); }
+.logo-btn .count.bump { animation: bump .3s var(--spring); }
+@keyframes bump { 50% { transform: scale(1.4); } }
+.logo-btn.egg-on::after { content: "🔊"; position: absolute; bottom: -6px; right: -8px; font-size: 13px; animation: popItem .5s var(--spring); }
+.shockwave { position: fixed; z-index: 59; width: 20px; height: 20px; margin: -10px 0 0 -10px; border-radius: 50%; border: 3px solid var(--accent); pointer-events: none; animation: shock .7s var(--smooth) forwards; }
+@keyframes shock { to { transform: scale(18); opacity: 0; border-width: 1px; } }
+/* ===== Secrets ===== */
+.app { transition: transform .9s var(--spring), filter .3s; }
+.app.flip { transform: rotate(180deg); }
+.app.fuse { animation: fuse .12s linear infinite; }
+@keyframes fuse { 0%,100% { transform: translate(0,0); } 25% { transform: translate(-3px,2px); } 50% { transform: translate(3px,-2px); } 75% { transform: translate(-2px,-3px); } }
+.app.fuse::after { content: ""; position: absolute; inset: 0; background: #fff; pointer-events: none; animation: fuseFlash .3s steps(2) infinite; z-index: 9; }
+@keyframes fuseFlash { 50% { opacity: .18; } 0%,100% { opacity: 0; } }
+.creeper { position: fixed; left: 50%; bottom: -10px; z-index: 70; width: 160px; height: 160px; margin-left: -80px; background: #3fae3f; image-rendering: pixelated;
+  background-image: linear-gradient(45deg, rgba(0,0,0,.12) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.12) 75%), linear-gradient(45deg, rgba(255,255,255,.08) 25%, transparent 25%, transparent 75%, rgba(255,255,255,.08) 75%);
+  background-size: 40px 40px; background-position: 0 0, 20px 20px; border-radius: 4px; animation: creepUp .6s var(--spring) both; }
+.creeper i { position: absolute; top: 40px; width: 40px; height: 40px; background: #0b0b0b; }
+.creeper i:first-child { left: 20px; } .creeper i:nth-child(2) { right: 20px; }
+.creeper b { position: absolute; left: 60px; top: 80px; width: 40px; height: 60px; background: #0b0b0b; box-shadow: -20px 20px 0 #0b0b0b, 20px 20px 0 #0b0b0b; }
+@keyframes creepUp { from { transform: translateY(100%); } }
+.creeper.blow { animation: blow .5s ease-out forwards; }
+@keyframes blow { to { transform: scale(2.4); opacity: 0; filter: brightness(3); } }
+body.flash::after { content: ""; position: fixed; inset: 0; background: #fff; z-index: 80; pointer-events: none; animation: whiteOut .9s ease-out forwards; }
+@keyframes whiteOut { from { opacity: .9; } to { opacity: 0; } }
+
+.herobrine { position: fixed; inset: 0; z-index: 75; background: radial-gradient(circle at 50% 45%, rgba(0,0,0,.6), #000 70%); display: grid; place-items: center; animation: fadeIn 1.2s ease both; cursor: none; }
+.herobrine .eyes { display: flex; gap: 46px; animation: eyesIn 1.5s .8s ease both; }
+.herobrine .eyes i { width: 26px; height: 14px; background: #fff; box-shadow: 0 0 22px 6px rgba(255,255,255,.75), 0 0 60px 20px rgba(255,255,255,.25); }
+.herobrine .msg { position: absolute; bottom: 18%; color: #ddd; font: 600 14px/1 "Cascadia Mono", Consolas, monospace; letter-spacing: .2em; opacity: 0; animation: fadeIn 1s 2.2s ease forwards; }
+.herobrine.out { animation: fadeOut .7s ease forwards; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeOut { to { opacity: 0; } }
+@keyframes eyesIn { 0% { opacity: 0; transform: scale(.6); } 60% { opacity: 1; } 70% { opacity: .2; } 80% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+
+body.disco .app { filter: hue-rotate(var(--disco, 0deg)) saturate(1.6); transition: filter .25s; }
+body.disco::before { content: ""; position: fixed; inset: 0; z-index: 3; pointer-events: none; mix-blend-mode: screen;
+  background: radial-gradient(400px 300px at 20% 30%, rgba(255,0,150,.25), transparent), radial-gradient(400px 300px at 80% 70%, rgba(0,200,255,.25), transparent), radial-gradient(300px 300px at 60% 20%, rgba(255,220,0,.2), transparent);
+  animation: discoLights .5s steps(2) infinite; }
+@keyframes discoLights { 50% { transform: rotate(180deg) scale(1.2); opacity: .6; } }
+body.disco .player .cover { animation: discoCover .25s ease-in-out infinite alternate !important; }
+@keyframes discoCover { to { transform: scale(1.15) rotate(8deg); } }
+
+.diamond { position: fixed; top: -40px; z-index: 65; pointer-events: none; animation: rain linear forwards; filter: drop-shadow(0 4px 8px rgba(0,200,255,.5)); }
+@keyframes rain { to { transform: translateY(calc(100vh + 80px)) rotate(var(--rot)); } }
+
+.speedrun { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 60; padding: 6px 14px; border-radius: 12px; background: rgba(0,0,0,.85); border: 1px solid var(--line-2); font: 600 14px/1.4 "Cascadia Mono", Consolas, monospace; color: #fff; display: flex; gap: 10px; align-items: baseline; animation: popItem .4s var(--spring); }
+.speedrun b { color: #4ade80; font-size: 18px; font-variant-numeric: tabular-nums; }
+.speedrun small { color: var(--text-3); font-size: 11px; }
+.speedrun.stop b { color: #facc15; animation: bump .4s var(--spring) 3; }
+
+.secret-card { margin-top: 14px; padding: 18px; }
+.sc-head { display: flex; justify-content: space-between; align-items: baseline; }
+.sc-head span { font-weight: 800; color: var(--accent-2); }
+.sc-bar { height: 6px; border-radius: 6px; background: var(--surface-3); margin: 10px 0 12px; overflow: hidden; }
+.sc-bar i { display: block; height: 100%; background: var(--accent); border-radius: 6px; transition: width .6s var(--spring); }
+.sc-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; font-size: 12.5px; }
+.sc-list .ok { color: #4ade80; font-weight: 600; }
+.sc-list .lock { color: var(--text-3); font-style: italic; }
+
+/* Theme picker (only for this preview) */
+.themes { position: fixed; left: 50%; transform: translateX(-50%); bottom: 22px; z-index: 30; display: flex; gap: 6px; padding: 6px; border-radius: 999px; background: rgba(18,18,22,.85); backdrop-filter: blur(16px); border: 1px solid var(--line-2); }
+.themes button { height: 30px; padding: 0 12px 0 8px; border-radius: 999px; display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; color: var(--text-2); }
+.themes button i { width: 14px; height: 14px; border-radius: 50%; }
+.themes button.on { background: var(--surface-3); color: var(--text); }
+.themes .lbl { font-size: 11px; color: var(--text-3); padding: 0 6px 0 10px; display: flex; align-items: center; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <button class="logo-btn" id="logoBtn" aria-label="Justice Client"><svg class="ring" viewBox="0 0 60 60"><circle cx="30" cy="30" r="27"/></svg><img class="logo" src="img/logo.png" alt=""></button>
+    <button class="nav on" data-go="home"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="tip">Domů</span></button>
+    <button class="nav" data-go="instances"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-9 5-9-5V8l9-5 9 5z"/><path d="m3.3 7.5 8.7 5 8.7-5M12 22V12.5"/></svg><span class="tip">Instance</span></button>
+    <button class="nav" data-go="mods"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4a2 2 0 1 0-4 0v2H6a1 1 0 0 0-1 1v4h2a2 2 0 1 1 0 4H5v4a1 1 0 0 0 1 1h4v-2a2 2 0 1 1 4 0v2h4a1 1 0 0 0 1-1v-4h-2a2 2 0 1 1 0-4h2V7a1 1 0 0 0-1-1h-4z"/></svg><span class="tip">Mody a modpacky</span></button>
+    <button class="nav" data-go="friends"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg><span class="dot"></span><span class="tip">Kamarádi</span></button>
+    <button class="nav" data-go="servers"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="7" rx="2"/><rect x="3" y="14" width="18" height="7" rx="2"/><path d="M7 6.5h.01M7 17.5h.01"/></svg><span class="tip">Servery</span></button>
+    <button class="nav" data-go="clips"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg><span class="tip">Klipy a natáčení</span></button>
+    <div class="spacer"></div>
+    <button class="nav music-btn on" id="musicBtn"><span class="eq"><i></i><i></i><i></i><i></i></span><span class="tip">Hudba (YouTube Music)</span></button>
+    <button class="nav" data-go="settings"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span class="tip">Nastavení</span></button>
+    <button class="me" data-go="settings" title="Účet Maxern_">M</button>
+  </aside>
+
+  <main class="main">
+    <div class="top">
+      <label class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="search" placeholder="Hledat instance, mody, kamarády…"><kbd>Ctrl K</kbd></label>
+      <div class="grow"></div>
+      <div class="pill" id="updPill" style="cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14"/></svg> Aktualizace <b>0.7.0</b></div>
+      <div class="pill" data-go="settings" style="cursor:pointer">Maxern_ <b>· Microsoft</b></div>
+      <div class="win">
+        <button><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg></button>
+        <button><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></button>
+        <button><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+    </div>
+
+    <div class="page on" data-page="home">
+    <section class="hero">
+      <div class="img"></div>
+      <div class="friends" data-go="friends" style="cursor:pointer"><div class="stack"><span style="background:#2563eb">N</span><span style="background:#16a34a">U</span><span style="background:#9333ea">K</span></div> 3 kamarádi hrají</div>
+      <div class="body">
+        <div class="eyebrow" id="heroWhen">Naposledy hráno · před 2 h</div>
+        <h1 id="heroName">PvP 1.21.11</h1>
+        <div class="chips" id="heroChips"></div>
+        <div class="actions">
+          <div class="play">
+            <button class="go" id="playBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5z"/></svg> HRÁT</button>
+            <button class="ver" id="verBtn"><span id="verName">PvP 1.21.11</span> <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="menu" id="verMenu"></div></div>
+          <button class="ghost" id="contBtn" data-join="Justice SMP"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg> <span>Justice SMP</span></button>
+          <button class="ghost" id="editBtn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4z"/></svg> Upravit</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid">
+      <div>
+        <div class="sec-h"><h2>Tvoje instance</h2><a data-go="instances">Zobrazit vše →</a></div>
+        <div class="insts" id="homeInsts"></div>
+      </div>
+
+      <div>
+        <div class="card">
+          <div class="sec-h" style="margin-bottom:6px"><h2>Kamarádi</h2><a data-go="friends">3 online →</a></div>
+          <div class="friend"><div class="av on" style="background:#2563eb">N</div><div><div class="n">Notch</div><div class="s">Hraje na <b>Justice SMP</b></div></div><button class="join" data-join="Justice SMP">Připojit</button></div>
+          <div class="friend"><div class="av on" style="background:#16a34a">U</div><div><div class="n">Uku</div><div class="s">PvP 1.21.11 · ve světě</div></div><button class="join" data-join="svět hráče Uku">Připojit</button></div>
+          <div class="friend"><div class="av on" style="background:#9333ea">K</div><div><div class="n">Kuba</div><div class="s">V launcheru</div></div></div>
+        </div>
+        <div class="card news">
+          <span class="tag">NOVINKA · 0.6.15</span>
+          <h3>Justice Mod na NeoForge a Forge</h3>
+          <ul><li>Menu, HUD, Clean HUD a zaměřovač na všech loaderech</li><li>Kategorie Modpacky a rychlejší instalace</li></ul>
+        </div>
+        <div class="card">
+          <div class="sec-h" style="margin-bottom:6px"><h2>Servery</h2><a data-go="servers">Všechny →</a></div>
+          <div class="srv" data-join="Justice SMP"><img src="../../src/assets/justicesmp.png" alt=""><div><div class="n" style="font-weight:600">Justice SMP</div><div class="s" style="font-size:12px;color:var(--text-3)">justicesmp.online</div></div><span class="p">● 24 ms · 12/50</span></div>
+          <div class="srv" data-join="Ertenix"><img src="../../src/assets/ertenix.png" alt=""><div><div class="n" style="font-weight:600">Ertenix</div><div class="s" style="font-size:12px;color:var(--text-3)">ertenix.net</div></div><span class="p">● 31 ms · 87/200</span></div>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="page" data-page="instances"></div>
+    <div class="page" data-page="mods"></div>
+    <div class="page" data-page="friends"></div>
+    <div class="page" data-page="servers"></div>
+    <div class="page" data-page="clips"></div>
+    <div class="page" data-page="settings"></div>
+  </main>
+</div>
+
+<div class="player" id="player">
+  <div class="grip" title="Přetáhni přehrávač kamkoli"></div>
+  <div class="row">
+    <div class="cover"></div>
+    <div class="track"><div class="t" id="tTitle">Blinding Lights</div><div class="a" id="tArtist">The Weeknd · After Hours</div></div>
+    <div class="ctrl">
+      <button id="prevBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h2v14H6zM20 5.5v13a1 1 0 0 1-1.5.8L9 12.8a1 1 0 0 1 0-1.6l9.5-6.5a1 1 0 0 1 1.5.8z"/></svg></button>
+      <button class="pp" id="ppBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+      <button id="nextBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 5h2v14h-2zM4 5.5v13a1 1 0 0 0 1.5.8l9.5-6.5a1 1 0 0 0 0-1.6L5.5 4.7A1 1 0 0 0 4 5.5z"/></svg></button>
+    </div>
+  </div>
+  <div class="bar"><span id="tPos">1:18</span> <div class="track-line" id="seek"><i id="tFill"></i></div> <span id="tLen">3:20</span></div>
+  <div class="ytm"><span class="live"></span> Propojeno s YouTube Music Desktop</div>
+  <div class="tabs">
+    <button id="plBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h13M3 12h13M3 18h9M17 18V8l4-1"/></svg> Playlisty</button>
+    <button id="qBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg> Fronta</button>
+    <button id="volBtn" title="Klikni = hlasitost o 10 %, pravý klik = ztlumit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7"/></svg> <span id="volTxt">70 %</span></button>
+  </div>
+  <div class="lists" id="lists"></div>
+</div>
+<div class="toasts" id="toasts"></div>
+<div class="launch" id="launch"></div>
+
+<div class="themes" id="themes">
+  <span class="lbl">Motiv:</span>
+  <button data-t="" class="on"><i style="background:#e11d38"></i>Justice</button>
+  <button data-t="midnight"><i style="background:#3b82f6"></i>Midnight</button>
+  <button data-t="aurora"><i style="background:#14b8a6"></i>Aurora</button>
+  <button data-t="sakura"><i style="background:#ec4899"></i>Sakura</button>
+  <button data-t="mono"><i style="background:#e5e5e5"></i>Mono</button>
+</div>
+
+<script>
+document.querySelectorAll("#themes button").forEach((b) => b.onclick = () => {
+  document.documentElement.dataset.theme = b.dataset.t;
+  document.querySelectorAll("#themes button").forEach((x) => x.classList.toggle("on", x === b));
+});
+const player = document.getElementById("player");
+// Drag the player by its grip or cover; it stays inside the window, snaps to a nearby edge and remembers where it was.
+(() => {
+  const KEY = "jc.player.pos", M = 16, SNAP = 40;
+  const clamp = (x, y) => [Math.max(M, Math.min(innerWidth - player.offsetWidth - M, x)), Math.max(M, Math.min(innerHeight - player.offsetHeight - M, y))];
+  const place = (x, y) => { [x, y] = clamp(x, y); player.style.left = x + "px"; player.style.top = y + "px"; player.style.right = player.style.bottom = "auto"; };
+  try { const p = JSON.parse(localStorage.getItem(KEY)); if (p) place(p.x * innerWidth, p.y * innerHeight); } catch {}
+  let start = null;
+  const down = (e) => {
+    if (e.button !== 0) return;
+    const r = player.getBoundingClientRect();
+    start = { dx: e.clientX - r.left, dy: e.clientY - r.top, x0: r.left, y0: r.top, w: r.width, h: r.height };
+    player.classList.add("dragging"); player.classList.remove("snap");
+    e.preventDefault();
+  };
+  player.querySelector(".grip").addEventListener("pointerdown", down);
+  player.querySelector(".cover").addEventListener("pointerdown", down);
+  let raf = 0;
+  let tx = 0, ty = 0;
+  addEventListener("pointermove", (e) => {
+    if (!start) return;
+    const x = Math.max(M, Math.min(innerWidth - start.w - M, e.clientX - start.dx));
+    const y = Math.max(M, Math.min(innerHeight - start.h - M, e.clientY - start.dy));
+    tx = Math.round(x - start.x0); ty = Math.round(y - start.y0);
+    if (!raf) raf = requestAnimationFrame(() => { raf = 0; player.style.transform = `translate3d(${tx}px, ${ty}px, 0)`; });
+  });
+  addEventListener("pointerup", () => {
+    if (!start) return;
+    cancelAnimationFrame(raf); raf = 0;
+    place(start.x0 + tx, start.y0 + ty);
+    player.style.transform = ""; tx = ty = 0;
+    start = null;
+    player.classList.remove("dragging");
+    const r = player.getBoundingClientRect();
+    let x = r.left, y = r.top;
+    if (x - M < SNAP) x = M; else if (innerWidth - r.right - M < SNAP) x = innerWidth;
+    if (y - M < SNAP) y = M; else if (innerHeight - r.bottom - M < SNAP) y = innerHeight;
+    player.classList.add("snap"); place(x, y);
+    const p = player.getBoundingClientRect();
+    try { localStorage.setItem(KEY, JSON.stringify({ x: p.left / innerWidth, y: p.top / innerHeight })); } catch {}
+  });
+  addEventListener("resize", () => { if (player.style.left) { const r = player.getBoundingClientRect(); place(r.left, r.top); } });
+  player.addEventListener("dblclick", (e) => { if (e.target.closest(".grip")) { try { localStorage.removeItem(KEY); } catch {} player.removeAttribute("style"); } });
+})();
+// ---------- Prototype data ----------
+const $ = (q, el = document) => el.querySelector(q);
+const $$ = (q, el = document) => [...el.querySelectorAll(q)];
+const PLAY_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>';
+const INSTS = [
+  { name: "PvP 1.21.11", loader: "Fabric", mc: "1.21.11", mods: 34, when: "před 2 h", time: "32 h 25 min", icon: "⚔", bg: "linear-gradient(135deg,#7f1d1d,#e11d38)", last: { kind: "server", name: "Hypixel · Duels", img: "img/pvp2.webp" } },
+  { name: "Cinematic", loader: "Fabric", mc: "1.21.11", mods: 22, when: "včera", time: "11 h 02 min", icon: "🎬", bg: "linear-gradient(135deg,#1e3a8a,#3b82f6)", last: { kind: "world", name: "My World", img: "img/vanilla.webp" } },
+  { name: "Justice SMP", loader: "NeoForge", mc: "1.21.11", mods: 61, when: "3 dny", time: "54 h 10 min", icon: "🌲", bg: "linear-gradient(135deg,#14532d,#22c55e)", last: { kind: "server", name: "Justice SMP", img: "img/shaders.webp", logo: "../../src/assets/justicesmp.png" } },
+  { name: "Shadery 26.2", loader: "Fabric", mc: "26.2", mods: 18, when: "týden", time: "4 h 40 min", icon: "✨", bg: "linear-gradient(135deg,#4c1d95,#a855f7)", last: { kind: "world", name: "New World", img: "img/nihher.webp" } },
+  { name: "Vanilla 26.3", loader: "Vanilla", mc: "26.3", mods: 0, when: "2 týdny", time: "1 h 15 min", icon: "🟩", bg: "linear-gradient(135deg,#365314,#84cc16)", last: { kind: "world", name: "Builds", img: "img/pvp.webp" } },
+  { name: "Forge 1.21.10", loader: "Forge", mc: "1.21.10", mods: 12, when: "nikdy", time: "0 min", icon: "🔨", bg: "linear-gradient(135deg,#27272a,#3f3f46)" },
+];
+const MODS = [
+  { name: "Sodium", by: "jellysquid3", d: "Výrazně víc FPS, moderní renderer", dl: "82 M", tags: ["Optimalizace"], icon: "⚡", bg: "#1f2937" },
+  { name: "Iris Shaders", by: "coderbot", d: "Shadery pro Fabric, kompatibilní s OptiFine packy", dl: "51 M", tags: ["Shadery"], icon: "🌈", bg: "#312e81" },
+  { name: "Lithium", by: "jellysquid3", d: "Optimalizace herní logiky a serveru", dl: "40 M", tags: ["Optimalizace"], icon: "🧪", bg: "#064e3b" },
+  { name: "Fabulously Optimized", by: "robotkoer", d: "Modpack: maximum FPS a pěkný vzhled", dl: "13 M", tags: ["Modpack"], icon: "📦", bg: "#7c2d12" },
+  { name: "Distant Horizons", by: "James Seibel", d: "Obrovská dohlednost pomocí LOD", dl: "9 M", tags: ["Grafika"], icon: "🏔", bg: "#0c4a6e" },
+  { name: "Flashback", by: "Moulberry", d: "Nahrávání a střih záznamů ze hry", dl: "3 M", tags: ["Natáčení"], icon: "🎥", bg: "#4a044e" },
+];
+const FRIENDS = [
+  { name: "Notch", c: "#2563eb", st: "Hraje na Justice SMP", on: true, join: "Justice SMP" },
+  { name: "Uku", c: "#16a34a", st: "PvP 1.21.11 · ve světě", on: true, join: "svět hráče Uku" },
+  { name: "Kuba", c: "#9333ea", st: "V launcheru", on: true },
+  { name: "Ježek", c: "#ea580c", st: "Před 3 h", on: false },
+  { name: "Sophie", c: "#db2777", st: "Včera", on: false },
+];
+const SERVERS = [
+  { name: "Justice SMP", addr: "justicesmp.online", img: "../../src/assets/justicesmp.png", ping: 24, pl: "12/50", motd: "Survival pro tvůrce · natáčení" },
+  { name: "Ertenix", addr: "ertenix.net", img: "../../src/assets/ertenix.png", ping: 31, pl: "87/200", motd: "Survival, ekonomika, minioni" },
+  { name: "Hypixel", addr: "mc.hypixel.net", ping: 98, pl: "41 203/200 000", motd: "Minihry, Bedwars, Skyblock", icon: "H", bg: "#b45309" },
+];
+const CLIPS = [
+  { t: "Clutch na Justice SMP", m: "PvP 1.21.11 · dnes", len: "0:30" },
+  { t: "1v3 u spawnu", m: "PvP 1.21.11 · včera", len: "0:45" },
+  { t: "Západ slunce – cinematic", m: "Cinematic · 2 dny", len: "1:12" },
+  { t: "Bedwars final kill", m: "Vanilla 26.3 · týden", len: "0:22" },
+];
+const TRACKS = [
+  { t: "Blinding Lights", a: "The Weeknd · After Hours", len: 200, c: "linear-gradient(135deg,#f97316,#db2777 55%,#7c3aed)" },
+  { t: "Levitating", a: "Dua Lipa · Future Nostalgia", len: 203, c: "linear-gradient(135deg,#06b6d4,#8b5cf6)" },
+  { t: "STAY", a: "The Kid LAROI, Justin Bieber", len: 141, c: "linear-gradient(135deg,#ef4444,#f59e0b)" },
+  { t: "Heat Waves", a: "Glass Animals · Dreamland", len: 238, c: "linear-gradient(135deg,#f59e0b,#ec4899)" },
+  { t: "As It Was", a: "Harry Styles · Harry's House", len: 167, c: "linear-gradient(135deg,#22c55e,#0ea5e9)" },
+];
+const PLAYLISTS = [
+  { n: "PvP hudba", k: "Playlist · 48 skladeb", c: "linear-gradient(135deg,#e11d38,#7f1d1d)", start: 2 },
+  { n: "Natáčení – lofi", k: "Playlist · 112 skladeb", c: "linear-gradient(135deg,#3b82f6,#1e3a8a)", start: 3 },
+  { n: "Oblíbené", k: "Playlist · 304 skladeb", c: "linear-gradient(135deg,#f59e0b,#b45309)", start: 0 },
+  { n: "Moje mix 1", k: "YouTube Music mix", c: "linear-gradient(135deg,#22c55e,#14532d)", start: 4 },
+];
+
+// ---------- Toasts ----------
+function toast(msg) {
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.textContent = msg;
+  $("#toasts").append(el);
+  setTimeout(() => { el.classList.add("out"); setTimeout(() => el.remove(), 260); }, 2600);
+}
+
+// ---------- Navigation ----------
+function go(page) {
+  $$(".page").forEach((p) => p.classList.toggle("on", p.dataset.page === page));
+  $$(".side .nav[data-go]").forEach((b) => b.classList.toggle("on", b.dataset.go === page));
+  $(".main").scrollTop = 0;
+  if (page === "friends") $('.side .nav[data-go="friends"] .dot')?.remove();
+}
+document.addEventListener("click", (e) => {
+  const g = e.target.closest("[data-go]");
+  if (g) { go(g.dataset.go); return; }
+  const j = e.target.closest("[data-join]");
+  if (j) { e.stopPropagation(); joinServer(j.dataset.join); }
+});
+function joinServer(name) {
+  toast(`Připojuji k ${name}…`);
+  launch(current, name);
+}
+
+// ---------- Hero + play ----------
+let current = INSTS[0];
+function setHero(inst) {
+  current = inst;
+  $("#heroName").textContent = inst.name;
+  $("#verName").textContent = inst.name;
+  $("#heroWhen").textContent = inst.last ? `Naposledy ${inst.last.kind === "server" ? "na serveru" : "ve světě"} ${inst.last.name} · ${inst.when}` : "Ještě nehráno";
+  $(".hero .img").style.backgroundImage = `url(${inst.last ? inst.last.img : "../web/img/mod-hud.webp"})`;
+  const cont = $("#contBtn");
+  if (cont) { cont.hidden = !inst.last; if (inst.last) { cont.dataset.join = inst.last.name; $("span", cont).textContent = inst.last.kind === "server" ? inst.last.name : `Pokračovat: ${inst.last.name}`; } }
+  $("#heroChips").innerHTML =
+    `<span class="chip">${inst.loader} ${inst.mc}</span><span class="chip">${inst.mods} modů</span>` +
+    (inst.loader !== "Vanilla" ? `<span class="chip acc">Justice Mod 1.8.7</span>` : "") + `<span class="chip">${inst.time}</span>`;
+}
+let launching = false;
+function launch(inst, server) {
+  if (launching) return;
+  setHero(inst);
+  go("home");
+  launching = true;
+  const play = $(".play"), btn = $("#playBtn");
+  play.classList.add("busy");
+  let p = 0;
+  const steps = ["Kontroluji soubory", "Stahuji knihovny", "Spouštím Minecraft"];
+  const t = setInterval(() => {
+    p = Math.min(100, p + 4 + Math.random() * 9);
+    btn.innerHTML = `<span class="pct">${Math.round(p)} %</span> <small style="font-weight:600;opacity:.8">${steps[Math.min(2, Math.floor(p / 34))]}</small>`;
+    if (p >= 100) {
+      clearInterval(t);
+      play.classList.remove("busy"); play.classList.add("running");
+      btn.innerHTML = `● HRAJE SE`;
+      toast(server ? `${inst.name} běží · ${server}` : `${inst.name} běží`);
+      setTimeout(() => { play.classList.remove("running"); btn.innerHTML = `${PLAY_SVG.replace('16" height="16', '18" height="18')} HRÁT`; launching = false; }, 4000);
+    }
+  }, 120);
+}
+$("#playBtn").onclick = () => launch(current);
+$("#verBtn").onclick = (e) => { e.stopPropagation(); $("#verMenu").classList.toggle("open"); };
+$("#verMenu").innerHTML = INSTS.map((i, n) => `<button data-i="${n}"><i style="background:${i.bg}">${i.icon}</i><span>${i.name}<small>${i.loader} ${i.mc}</small></span></button>`).join("");
+$("#verMenu").onclick = (e) => { const b = e.target.closest("[data-i]"); if (b) { setHero(INSTS[b.dataset.i]); $("#verMenu").classList.remove("open"); } };
+document.addEventListener("click", (e) => { if (!e.target.closest(".play")) $("#verMenu").classList.remove("open"); });
+$("#editBtn").onclick = () => { go("instances"); toast(`Otevírám nastavení instance ${current.name}`); };
+$("#updPill").onclick = () => toast("Stahuji aktualizaci 0.7.0… (jen ukázka)");
+
+const placeBadge = (l) => l ? `<span class="place">${l.logo ? `<img src="${l.logo}" alt="">` : l.kind === "server" ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="3" width="18" height="7" rx="2"/><rect x="3" y="14" width="18" height="7" rx="2"/></svg>' : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>'}${l.name}</span>` : `<span class="place muted">Ještě nehráno</span>`;
+function instCard(i, n) {
+  const art = i.last ? `background-image:url(${i.last.img})` : `background:${i.bg}`;
+  return `<div class="inst" data-i="${n}"><div class="art" style="${art}">${i.last ? "" : i.icon}${placeBadge(i.last)}</div><button class="qp" data-play="${n}" title="Hrát">${PLAY_SVG}</button><div class="info"><div class="name">${i.name}</div><div class="meta">${i.loader} ${i.mc} · ${i.when}</div></div></div>`;
+}
+const NEW_CARD = `<div class="inst new" data-new><div style="text-align:center"><div style="font-size:26px;line-height:1">+</div>Nová instance</div></div>`;
+$("#homeInsts").innerHTML = INSTS.slice(0, 4).map(instCard).join("") + NEW_CARD;
+document.addEventListener("click", (e) => {
+  const qp = e.target.closest("[data-play]");
+  if (qp) { e.stopPropagation(); launch(INSTS[qp.dataset.play]); return; }
+  const card = e.target.closest(".inst[data-i]");
+  if (card) { setHero(INSTS[card.dataset.i]); go("home"); return; }
+  if (e.target.closest("[data-new]")) toast("Tady se otevře průvodce novou instancí");
+});
+
+// ---------- Pages ----------
+$('[data-page="instances"]').innerHTML = `
+  <div class="ph"><div><h1>Instance</h1><p>${INSTS.length} instancí · klikni pro výběr, ▶ pro spuštění</p></div><button class="btn acc" data-new>+ Nová instance</button></div>
+  <div class="seg" id="instSeg"><button class="on" data-f="">Vše</button><button data-f="Fabric">Fabric</button><button data-f="NeoForge">NeoForge</button><button data-f="Forge">Forge</button><button data-f="Vanilla">Vanilla</button></div>
+  <div class="insts" id="allInsts"></div>`;
+function renderInsts(f = "") { $("#allInsts").innerHTML = INSTS.map((i, n) => (!f || i.loader === f ? instCard(i, n) : "")).join("") + NEW_CARD; }
+renderInsts();
+$("#instSeg").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; $$("#instSeg button").forEach((x) => x.classList.toggle("on", x === b)); renderInsts(b.dataset.f); };
+
+$('[data-page="mods"]').innerHTML = `
+  <div class="ph"><div><h1>Mody a modpacky</h1><p>Instalace do: <b style="color:var(--text)" id="modTarget">PvP 1.21.11</b></p></div></div>
+  <div class="seg" id="modSeg"><button class="on">Mody</button><button>Modpacky</button><button>Shadery</button><button>Resource packy</button></div>
+  <div class="list" id="modList"></div>`;
+$("#modList").innerHTML = MODS.map((m, n) => `<div class="item"><div class="ic" style="background:${m.bg}">${m.icon}</div><div class="tx"><b>${m.name} <span>od ${m.by}</span></b><span>${m.d}</span><div class="tags">${m.tags.map((t) => `<i>${t}</i>`).join("")}<i>⬇ ${m.dl}</i></div></div><button class="btn" data-mod="${n}">Instalovat</button></div>`).join("");
+$("#modList").onclick = (e) => {
+  const b = e.target.closest("[data-mod]");
+  if (!b || b.classList.contains("done")) return;
+  b.textContent = "Instaluji…";
+  setTimeout(() => { b.textContent = "✓ Nainstalováno"; b.classList.add("done"); toast(`${MODS[b.dataset.mod].name} nainstalován do ${current.name}`); }, 900);
+};
+$("#modSeg").onclick = (e) => { const b = e.target.closest("button"); if (b) $$("#modSeg button").forEach((x) => x.classList.toggle("on", x === b)); };
+
+const chats = { Notch: [["Jdeš na SMP?", 0], ["Za 5 min tam jsem", 1]], Uku: [["Hodíme 1v1?", 0]], Kuba: [], Ježek: [["Díky za ten modpack!", 0]], Sophie: [] };
+$('[data-page="friends"]').innerHTML = `
+  <div class="ph"><div><h1>Kamarádi</h1><p>3 online · chat, pozvánky do hry a sdílení světa</p></div><button class="btn">+ Přidat kamaráda</button></div>
+  <div class="fr-wrap"><div class="card fr-list" id="frList"></div><div class="chat" id="chat"></div></div>`;
+function renderFriends(sel = "Notch") {
+  $("#frList").innerHTML = FRIENDS.map((f) => `<div class="friend ${f.name === sel ? "on" : ""}" data-f="${f.name}"><div class="av ${f.on ? "on" : ""}" style="background:${f.c}">${f.name[0]}</div><div><div class="n">${f.name}</div><div class="s">${f.st}</div></div></div>`).join("");
+  const f = FRIENDS.find((x) => x.name === sel);
+  $("#chat").innerHTML = `<div class="head"><div class="av ${f.on ? "on" : ""}" style="background:${f.c}">${f.name[0]}</div><div style="flex:1"><b>${f.name}</b><div style="font-size:12px;color:var(--text-3)">${f.st}</div></div>${f.join ? `<button class="btn acc" data-join="${f.join}">Připojit</button>` : ""}<button class="btn" id="invite">Pozvat do hry</button></div>
+    <div class="msgs">${(chats[sel] || []).map(([m, me]) => `<div class="bub ${me ? "mine" : ""}">${m}</div>`).join("") || `<div style="color:var(--text-3);margin:auto">Zatím žádné zprávy</div>`}</div>
+    <form id="chatForm"><input placeholder="Napiš zprávu ${f.name}…" autocomplete="off"><button class="btn acc">Poslat</button></form>`;
+  $("#invite").onclick = () => toast(`Pozvánka poslána hráči ${f.name}`);
+  $("#chatForm").onsubmit = (e) => { e.preventDefault(); const v = e.target[0].value.trim(); if (!v) return; (chats[sel] ||= []).push([v, 1]); renderFriends(sel); $("#chatForm input").focus(); };
+}
+renderFriends();
+$("#frList").onclick = (e) => { const f = e.target.closest("[data-f]"); if (f) renderFriends(f.dataset.f); };
+
+$('[data-page="servers"]').innerHTML = `
+  <div class="ph"><div><h1>Servery</h1><p>Rychlé připojení s tvou vybranou instancí</p></div><button class="btn">+ Přidat server</button></div>
+  <div class="list">${SERVERS.map((s) => `<div class="item">${s.img ? `<img class="logo-img" src="${s.img}" alt="">` : `<div class="ic" style="background:${s.bg};width:40px;height:40px;border-radius:11px;font-size:17px;font-weight:800">${s.icon}</div>`}<div class="tx"><b>${s.name}</b><span>${s.addr} · ${s.motd}</span></div><span style="color:#22c55e;font-size:12.5px;margin-right:8px">● ${s.ping} ms · ${s.pl}</span><button class="btn acc" data-join="${s.name}">Připojit</button></div>`).join("")}</div>`;
+
+$('[data-page="clips"]').innerHTML = `
+  <div class="ph"><div><h1>Klipy a natáčení</h1><p>Klip uložíš klávesou F8 · posledních 30 s</p></div><button class="btn acc" id="recBtn">● Natáčecí režim</button></div>
+  <div class="clips">${CLIPS.map((c) => `<div class="clip"><div class="th"><em>${c.len}</em></div><div class="tx"><b>${c.t}</b><span>${c.m}</span></div></div>`).join("")}</div>`;
+$("#recBtn").onclick = (e) => { e.target.classList.toggle("done"); toast(e.target.classList.contains("done") ? "Natáčecí režim zapnutý" : "Natáčecí režim vypnutý"); };
+$(".clips").onclick = (e) => { const c = e.target.closest(".clip"); if (c) toast(`Přehrávám „${$("b", c).textContent}“`); };
+
+const THEMES = [["", "Justice", "#050506", "#e11d38"], ["midnight", "Midnight", "#05070d", "#3b82f6"], ["aurora", "Aurora", "#04080a", "#14b8a6"], ["sakura", "Sakura", "#0a0508", "#ec4899"], ["mono", "Mono", "#0b0b0c", "#e5e5e5"]];
+$('[data-page="settings"]').innerHTML = `
+  <div class="ph"><div><h1>Nastavení</h1><p>Vzhled, hra, hudba a účty</p></div></div>
+  <div class="set-grid">
+    <div class="set-nav"><button class="on">Vzhled</button><button>Hra a Java</button><button>Hudba</button><button>Účty</button><button>O aplikaci</button></div>
+    <div>
+      <div class="card" style="padding:18px"><b>Motiv</b><div style="color:var(--text-3);font-size:12.5px;margin:2px 0 12px">Barvy celého launcheru i Justice Modu ve hře</div>
+        <div class="swatches" id="swatches">${THEMES.map(([id, n, bg, ac]) => `<button class="swatch ${id === "" ? "on" : ""}" data-t="${id}"><div class="pv" style="background:${bg}"><i style="background:${ac}"></i></div>${n}</button>`).join("")}</div></div>
+      <div class="card" style="padding:0;margin-top:14px">
+        <div class="set"><div class="tx"><b>Velké pozadí na domovské stránce</b><span>Obrázek z vybrané instance za tlačítkem Hrát</span></div><button class="sw on"></button></div>
+        <div class="set"><div class="tx"><b>Animace</b><span>Plynulé přechody mezi stránkami</span></div><button class="sw on"></button></div>
+        <div class="set"><div class="tx"><b>Paměť pro hru</b><span id="ramTxt">6 GB</span></div><input type="range" min="2" max="14" value="6" id="ram"></div>
+        <div class="set"><div class="tx"><b>Discord status</b><span>„Hraje Justice Client“ na Discordu</span></div><button class="sw on"></button></div>
+      </div>
+      <div class="card" style="padding:0;margin-top:14px">
+        <div class="ytm-card"><div class="logo2">▶</div><div style="flex:1"><b>YouTube Music Desktop</b><div style="color:var(--text-3);font-size:12.5px" id="ytmState">Propojeno · ovládání hudby z launcheru i ze hry</div></div><button class="btn" id="ytmBtn">Odpojit</button></div>
+      </div>
+    </div>
+  </div>`;
+$("#swatches").onclick = (e) => { const b = e.target.closest("[data-t]"); if (b) setTheme(b.dataset.t); };
+$$('[data-page="settings"] .sw').forEach((s) => (s.onclick = () => s.classList.toggle("on")));
+$("#ram").oninput = (e) => ($("#ramTxt").textContent = `${e.target.value} GB`);
+$$(".set-nav button").forEach((b) => (b.onclick = () => { $$(".set-nav button").forEach((x) => x.classList.toggle("on", x === b)); if (b.textContent !== "Vzhled") toast(`Sekce „${b.textContent}“ – v návrhu zatím jen Vzhled`); }));
+let ytmLinked = true;
+$("#ytmBtn").onclick = () => {
+  ytmLinked = !ytmLinked;
+  if (ytmLinked) { $("#ytmState").textContent = "Propojeno · ovládání hudby z launcheru i ze hry"; $("#ytmBtn").textContent = "Odpojit"; player.classList.remove("hidden"); toast("YouTube Music propojeno"); }
+  else { $("#ytmState").innerHTML = 'Nepropojeno · v YTMDesktopu potvrď kód <span class="code">4821</span>'; $("#ytmBtn").textContent = "Propojit"; player.classList.add("hidden"); }
+};
+function setTheme(t) {
+  document.documentElement.dataset.theme = t;
+  $$("#themes button").forEach((x) => x.classList.toggle("on", x.dataset.t === t));
+  $$("#swatches .swatch").forEach((x) => x.classList.toggle("on", x.dataset.t === t));
+}
+$$("#themes button").forEach((b) => (b.onclick = () => setTheme(b.dataset.t)));
+
+// ---------- Search ----------
+$("#search").addEventListener("keydown", (e) => {
+  if (e.key !== "Enter") return;
+  const q = e.target.value.trim().toLowerCase();
+  if (!q) return;
+  const i = INSTS.findIndex((x) => x.name.toLowerCase().includes(q));
+  if (i >= 0) { setHero(INSTS[i]); go("home"); toast(`Nalezena instance ${INSTS[i].name}`); return; }
+  if (FRIENDS.some((f) => f.name.toLowerCase().includes(q))) { go("friends"); renderFriends(FRIENDS.find((f) => f.name.toLowerCase().includes(q)).name); return; }
+  go("mods"); toast(`Hledám „${e.target.value}“ v modech`);
+});
+addEventListener("keydown", (e) => { if (e.ctrlKey && e.key.toLowerCase() === "k") { e.preventDefault(); $("#search").focus(); } });
+
+// ---------- Music player ----------
+let ti = 0, pos = 78, paused = false, vol = 70, panel = "";
+$("#ppBtn").innerHTML = '<svg class="pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><svg class="playi" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>';
+const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+function renderTrack() {
+  const t = TRACKS[ti];
+  $("#tTitle").textContent = t.t; $("#tArtist").textContent = t.a; $(".player .cover").style.background = t.c;
+  $("#tLen").textContent = fmt(t.len); $("#tPos").textContent = fmt(pos); $("#tFill").style.width = `${(pos / t.len) * 100}%`;
+  player.classList.toggle("paused", paused); $("#musicBtn").classList.toggle("paused", paused);
+  $$("#lists [data-tr]").forEach((r) => { const now = +r.dataset.tr === ti; r.classList.toggle("now", now); $(".go2", r).textContent = now ? "♪" : "▶"; });
+}
+function setTrack(i) { ti = (i + TRACKS.length) % TRACKS.length; pos = 0; paused = false; renderTrack(); }
+$("#ppBtn").onclick = () => { paused = !paused; renderTrack(); };
+$("#nextBtn").onclick = () => setTrack(ti + 1);
+$("#prevBtn").onclick = () => (pos > 5 ? ((pos = 0), renderTrack()) : setTrack(ti - 1));
+$("#seek").onclick = (e) => { const r = e.currentTarget.getBoundingClientRect(); pos = ((e.clientX - r.left) / r.width) * TRACKS[ti].len; renderTrack(); };
+$("#volBtn").onclick = () => { vol = vol >= 100 ? 10 : vol + 10; $("#volTxt").textContent = `${vol} %`; };
+$("#volBtn").oncontextmenu = (e) => { e.preventDefault(); vol = 0; $("#volTxt").textContent = "ztlumeno"; };
+function renderPanel() {
+  const el = $("#lists");
+  if (panel === "pl") el.innerHTML = `<div class="inner"><div class="hdr">Tvoje playlisty</div>` + PLAYLISTS.map((p, n) => `<div class="pl" data-pl="${n}"><div class="c" style="background:${p.c}"></div><div><div class="n">${p.n}</div><div class="k">${p.k}</div></div><span class="go2">▶</span></div>`).join("") + "</div>";
+  else el.innerHTML = `<div class="inner"><div class="hdr">Fronta</div>` + TRACKS.map((t, n) => `<div class="pl ${n === ti ? "now" : ""}" data-tr="${n}"><div class="c" style="background:${t.c}"></div><div><div class="n">${t.t}</div><div class="k">${t.a}</div></div><span class="go2">${n === ti ? "♪" : "▶"}</span></div>`).join("") + "</div>";
+}
+function openPanel(p) {
+  panel = panel === p ? "" : p;
+  player.classList.toggle("open", !!panel);
+  $("#plBtn").classList.toggle("on", panel === "pl"); $("#qBtn").classList.toggle("on", panel === "q");
+  if (panel) { renderPanel(); player.classList.add("popping"); clearTimeout(openPanel.t); openPanel.t = setTimeout(() => player.classList.remove("popping"), 800); }
+  if (panel && player.style.top) setTimeout(() => {
+    const r = player.getBoundingClientRect(), over = r.bottom - (innerHeight - 16);
+    if (over > 0) { player.classList.add("snap"); player.style.top = `${Math.max(16, r.top - over)}px`; }
+  }, 470);
+}
+$("#plBtn").onclick = () => openPanel("pl");
+$("#qBtn").onclick = () => openPanel("q");
+$("#lists").onclick = (e) => {
+  const p = e.target.closest("[data-pl]"), t = e.target.closest("[data-tr]");
+  if (p) { setTrack(PLAYLISTS[p.dataset.pl].start); toast(`Hraje playlist ${PLAYLISTS[p.dataset.pl].n}`); }
+  if (t) setTrack(+t.dataset.tr);
+};
+setInterval(() => { if (paused || !ytmLinked) return; pos += 1; if (pos >= TRACKS[ti].len) setTrack(ti + 1); else renderTrack(); }, 1000);
+$("#musicBtn").onclick = () => { if (!ytmLinked) { go("settings"); return; } player.classList.toggle("hidden"); };
+$$(".win button").forEach((b, n) => (b.onclick = () => toast(["Minimalizovat okno", "Maximalizovat okno", "Zavřít launcher"][n] + " (v návrhu nic nedělá)")));
+// ---------- Satisfying bits ----------
+// Ripple from the click point on buttons.
+document.addEventListener("pointerdown", (e) => {
+  const b = e.target.closest(".btn, .go, .ver, .ghost, .join, .nav, .tabs button, .ctrl button, .qp, .seg button, .set-nav button");
+  if (!b) return;
+  const r = b.getBoundingClientRect(), d = Math.max(r.width, r.height) * 2.2;
+  const s = document.createElement("span");
+  s.className = "rip";
+  s.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX - r.left - d / 2}px;top:${e.clientY - r.top - d / 2}px`;
+  b.append(s);
+  setTimeout(() => s.remove(), 650);
+});
+// 3D tilt + glare following the mouse on instance cards.
+document.addEventListener("pointermove", (e) => {
+  const c = e.target.closest(".inst:not(.new)");
+  $$(".inst.tilting").forEach((x) => { if (x !== c) { x.classList.remove("tilting"); x.style.transform = ""; } });
+  if (!c) return;
+  if (!c.querySelector(".glare")) c.insertAdjacentHTML("afterbegin", '<div class="glare"></div>');
+  const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+  c.classList.add("tilting");
+  c.style.transform = `perspective(700px) rotateX(${(0.5 - y) * 8}deg) rotateY(${(x - 0.5) * 10}deg) translateY(-4px)`;
+  c.style.setProperty("--mx", `${x * 100}%`); c.style.setProperty("--my", `${y * 100}%`);
+});
+// Burst helpers.
+function burst(x, y, n = 18) {
+  const colors = [getComputedStyle(document.documentElement).getPropertyValue("--accent").trim(), "#fff", getComputedStyle(document.documentElement).getPropertyValue("--accent-2").trim()];
+  for (let i = 0; i < n; i++) {
+    const c = document.createElement("i");
+    c.className = "conf";
+    const a = Math.random() * Math.PI * 2, d = 60 + Math.random() * 90;
+    c.style.cssText = `left:${x}px;top:${y}px;background:${colors[i % 3]};--dx:${Math.cos(a) * d}px;--dy:${Math.sin(a) * d - 40}px;--rot:${Math.random() * 720 - 360}deg`;
+    document.body.append(c);
+    setTimeout(() => c.remove(), 1000);
+  }
+}
+function notes(el) {
+  const r = el.getBoundingClientRect();
+  ["♪", "♫", "♬"].forEach((n, i) => {
+    const s = document.createElement("span");
+    s.className = "note"; s.textContent = n;
+    s.style.cssText = `left:${r.left + r.width / 2 - 8}px;top:${r.top}px;--dx:${(i - 1) * 34}px;--rot:${(i - 1) * 25}deg;animation-delay:${i * 0.08}s`;
+    document.body.append(s);
+    setTimeout(() => s.remove(), 1400);
+  });
+}
+// Hook the existing actions.
+const _setHero = setHero;
+setHero = (inst) => { _setHero(inst); ["#heroName", "#heroWhen", "#heroChips"].forEach((q) => { const el = $(q); el.classList.remove("swap"); void el.offsetWidth; el.classList.add("swap"); }); };
+const _launch = launch;
+launch = (inst, server) => {
+  if (launching) return;
+  _launch(inst, server);
+  const play = $(".play");
+  let fill = $(".fill", play);
+  if (!fill) { fill = document.createElement("span"); fill.className = "fill"; $(".go", play).append(fill); }
+  const t = setInterval(() => {
+    const m = /(\d+) %/.exec($("#playBtn").textContent);
+    if (m) { fill.style.width = `${m[1]}%`; if (!$(".fill", $("#playBtn"))) $("#playBtn").append(fill); }
+    if (play.classList.contains("running")) { clearInterval(t); fill.remove(); const r = $("#playBtn").getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, 26); }
+  }, 60);
+};
+const _setTrack = setTrack;
+setTrack = (i) => { _setTrack(i); const tr = $(".player .track"); tr.classList.remove("change"); void tr.offsetWidth; tr.classList.add("change"); notes($(".player .cover")); };
+$("#nextBtn").onclick = () => setTrack(ti + 1);
+$("#prevBtn").onclick = () => (pos > 5 ? ((pos = 0), renderTrack()) : setTrack(ti - 1));
+$("#ppBtn").onclick = () => { paused = !paused; renderTrack(); $$("#ppBtn svg").forEach((s) => { s.style.animation = "none"; void s.offsetWidth; s.style.animation = ""; }); if (!paused) notes($(".player .cover")); };
+// Re-trigger staggered entrance on page change.
+const _go = go;
+go = (page) => {
+  _go(page);
+  $$(`.page[data-page="${page}"] .insts, .page[data-page="${page}"] .list, .page[data-page="${page}"] .clips, .page[data-page="${page}"] .swatches, #frList`).forEach((g) => {
+    [...g.children].forEach((c, i) => { c.style.animation = "none"; void c.offsetWidth; c.style.animation = `rise .45s ${i * 0.045}s var(--smooth) both`; });
+  });
+};
+// Confetti on installs and theme picks.
+$("#modList").addEventListener("click", (e) => { const b = e.target.closest("[data-mod]"); if (b && !b.classList.contains("done")) setTimeout(() => { const r = b.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, 14); }, 920); });
+document.addEventListener("click", (e) => { const s = e.target.closest(".swatch, #themes button"); if (s) { const r = s.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, 10); } });
+// Play button follows the mouse a little (magnetic).
+$(".play").addEventListener("pointermove", (e) => { const r = e.currentTarget.getBoundingClientRect(); e.currentTarget.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.06}px, ${(e.clientY - r.top - r.height / 2) * 0.12}px)`; });
+$(".play").addEventListener("pointerleave", (e) => (e.currentTarget.style.transform = ""));
+
+// ---------- Easter egg: 10 clicks on the logo toggles a funny startup sound ----------
+(() => {
+  const KEY = "jc.egg.sound", NEED = 10, btn = $("#logoBtn"), logo = $(".logo", btn);
+  btn.insertAdjacentHTML("beforeend", '<span class="count"></span>');
+  const ring = $(".ring circle", btn), count = $(".count", btn);
+  let on = false; try { on = localStorage.getItem(KEY) === "1"; } catch {}
+  btn.classList.toggle("egg-on", on);
+  let n = 0, reset = 0, actx = null;
+  const ac = () => (actx ||= new (window.AudioContext || window.webkitAudioContext)());
+  // Cartoon "boing" + a little fanfare, all synthesized.
+  function boing() {
+    const a = ac(), t = a.currentTime, o = a.createOscillator(), g = a.createGain(), lfo = a.createOscillator(), lg = a.createGain();
+    o.type = "triangle"; o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(620, t + 0.12); o.frequency.exponentialRampToValueAtTime(90, t + 0.7);
+    lfo.frequency.value = 22; lg.gain.value = 45; lfo.connect(lg); lg.connect(o.frequency);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.5, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.75);
+    o.connect(g).connect(a.destination); o.start(t); lfo.start(t); o.stop(t + 0.8); lfo.stop(t + 0.8);
+    [523, 659, 784, 1047].forEach((f, i) => {
+      const x = a.createOscillator(), y = a.createGain(), s = t + 0.75 + i * 0.1;
+      x.type = "square"; x.frequency.value = f;
+      y.gain.setValueAtTime(0.0001, s); y.gain.exponentialRampToValueAtTime(0.12, s + 0.01); y.gain.exponentialRampToValueAtTime(0.0001, s + (i === 3 ? 0.45 : 0.12));
+      x.connect(y).connect(a.destination); x.start(s); x.stop(s + 0.5);
+    });
+  }
+  // Sad trombone "wah wah wah waaah".
+  function wahwah() {
+    const a = ac(), t = a.currentTime;
+    [[392, 0, .35], [370, .38, .35], [349, .76, .35], [330, 1.14, 1.0]].forEach(([f, d, len]) => {
+      const o = a.createOscillator(), g = a.createGain(), v = a.createOscillator(), vg = a.createGain(), s = t + d;
+      o.type = "sawtooth"; o.frequency.setValueAtTime(f, s); if (len > .5) o.frequency.linearRampToValueAtTime(f - 18, s + len);
+      v.frequency.value = len > .5 ? 6 : 0; vg.gain.value = 6; v.connect(vg); vg.connect(o.frequency);
+      const lp = a.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 900;
+      g.gain.setValueAtTime(0.0001, s); g.gain.exponentialRampToValueAtTime(0.22, s + 0.04); g.gain.exponentialRampToValueAtTime(0.0001, s + len);
+      o.connect(lp).connect(g).connect(a.destination); o.start(s); v.start(s); o.stop(s + len + .05); v.stop(s + len + .05);
+    });
+  }
+  // Tiny tick on every click, rising in pitch.
+  function tick(i) {
+    const a = ac(), t = a.currentTime, o = a.createOscillator(), g = a.createGain();
+    o.type = "sine"; o.frequency.value = 420 + i * 70;
+    g.gain.setValueAtTime(0.08, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.08);
+    o.connect(g).connect(a.destination); o.start(t); o.stop(t + 0.09);
+  }
+  function shock() { const r = btn.getBoundingClientRect(), w = document.createElement("i"); w.className = "shockwave"; w.style.left = `${r.left + r.width / 2}px`; w.style.top = `${r.top + r.height / 2}px`; document.body.append(w); setTimeout(() => w.remove(), 700); }
+  function show() {
+    ring.style.strokeDashoffset = 170 - (170 * n) / NEED;
+    count.textContent = NEED - n;
+    count.classList.remove("bump"); void count.offsetWidth; count.classList.add("bump");
+    btn.classList.toggle("counting", n > 0);
+    btn.classList.toggle("shake", n >= 7 && n < NEED);
+  }
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    clearTimeout(reset);
+    n++;
+    logo.classList.remove("squish", "boom", "sad"); void logo.offsetWidth;
+    if (n < NEED) {
+      logo.classList.add("squish"); tick(n); show();
+      reset = setTimeout(() => { n = 0; show(); }, 1600);
+      return;
+    }
+    n = 0; show();
+    on = !on;
+    try { localStorage.setItem(KEY, on ? "1" : "0"); } catch {}
+    btn.classList.toggle("egg-on", on);
+    const r = btn.getBoundingClientRect();
+    if (on) { logo.classList.add("boom"); boing(); shock(); burst(r.left + r.width / 2, r.top + r.height / 2, 40); toast("🔊 Tajný zvuk zapnutý – zazní při každém startu"); }
+    else { logo.classList.add("sad"); wahwah(); toast("🔇 Tajný zvuk vypnutý"); }
+  });
+  // Startup sound. A browser may block audio until the first click; then it plays on that click.
+  if (on) {
+    const play = () => { try { boing(); setTimeout(() => { logo.classList.remove("boom"); void logo.offsetWidth; logo.classList.add("boom"); }, 0); } catch {} };
+    try { ac(); if (actx.state === "running") play(); else { actx.resume().then(() => actx.state === "running" ? play() : addEventListener("pointerdown", () => actx.resume().then(play), { once: true })); } }
+    catch { addEventListener("pointerdown", play, { once: true }); }
+  }
+})();
+
+// ---------- More secrets ----------
+const SECRETS = {
+  logo: "Tajný zvuk při startu",
+  konami: "Creeper za zády",
+  jeb: "jeb_",
+  dinnerbone: "Dinnerbone",
+  herobrine: "Herobrine",
+  disco: "Disko",
+  diamonds: "Diamantový déšť",
+  speedrun: "Speedrunner",
+};
+function foundSecrets() { try { return JSON.parse(localStorage.getItem("jc.secrets") || "[]"); } catch { return []; } }
+function found(id) {
+  const f = foundSecrets();
+  if (f.includes(id)) return;
+  f.push(id);
+  try { localStorage.setItem("jc.secrets", JSON.stringify(f)); } catch {}
+  setTimeout(() => toast(`🏆 Tajemství nalezeno (${f.length}/${Object.keys(SECRETS).length}): ${SECRETS[id]}`), 600);
+  renderSecretCard();
+}
+// The logo egg reports itself too.
+$("#logoBtn").addEventListener("click", () => setTimeout(() => { if ($("#logoBtn").classList.contains("egg-on")) found("logo"); }, 0));
+
+let sx = null;
+const sfx = () => (sx ||= new (window.AudioContext || window.webkitAudioContext)());
+function noise(dur, filterType, freq, gain, delay = 0) {
+  const a = sfx(), t = a.currentTime + delay, len = Math.floor(a.sampleRate * dur), buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  const src = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
+  src.buffer = buf; f.type = filterType; f.frequency.value = freq;
+  g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.connect(f).connect(g).connect(a.destination); src.start(t);
+  return f;
+}
+function tone(type, f0, f1, dur, gain, delay = 0) {
+  const a = sfx(), t = a.currentTime + delay, o = a.createOscillator(), g = a.createGain();
+  o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(gain, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur + 0.05);
+}
+
+// 1) Konami code -> creeper
+const KONAMI = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+let kIdx = 0;
+function creeper() {
+  const app = $(".app");
+  const face = document.createElement("div");
+  face.className = "creeper";
+  face.innerHTML = '<i></i><i></i><b></b>';
+  document.body.append(face);
+  noise(1.5, "bandpass", 3200, 0.25);
+  app.classList.add("fuse");
+  setTimeout(() => {
+    app.classList.remove("fuse");
+    face.classList.add("blow");
+    noise(1.4, "lowpass", 600, 0.9); tone("sine", 120, 30, 0.9, 0.6);
+    document.body.classList.add("flash");
+    const r = face.getBoundingClientRect();
+    burst(r.left + r.width / 2, r.top + r.height / 2, 70);
+    setTimeout(() => { document.body.classList.remove("flash"); face.remove(); }, 900);
+    found("konami");
+  }, 1500);
+}
+
+// 2-4) Typed words
+let typed = "";
+let rainbow = 0;
+function jeb() {
+  if (rainbow) {
+    clearInterval(rainbow); rainbow = 0;
+    ["--accent", "--accent-2", "--accent-glow", "--accent-soft"].forEach((v) => document.documentElement.style.removeProperty(v));
+    toast("🐑 jeb_ odešel"); return;
+  }
+  let h = 0;
+  rainbow = setInterval(() => {
+    h = (h + 4) % 360;
+    const st = document.documentElement.style;
+    st.setProperty("--accent", `hsl(${h} 90% 55%)`); st.setProperty("--accent-2", `hsl(${h} 95% 70%)`);
+    st.setProperty("--accent-glow", `hsl(${h} 90% 55% / .35)`); st.setProperty("--accent-soft", `hsl(${h} 90% 55% / .14)`);
+  }, 80);
+  tone("square", 400, 900, 0.25, 0.08); tone("square", 600, 1200, 0.25, 0.08, 0.12);
+  toast("🌈 jeb_ je tady");
+  found("jeb");
+}
+function dinnerbone() {
+  const app = $(".app");
+  app.classList.add("flip");
+  tone("triangle", 300, 150, 0.6, 0.15);
+  setTimeout(() => { app.classList.remove("flip"); tone("triangle", 150, 300, 0.6, 0.15); }, 4000);
+  found("dinnerbone");
+}
+function herobrine() {
+  const o = document.createElement("div");
+  o.className = "herobrine";
+  o.innerHTML = '<div class="eyes"><i></i><i></i></div><div class="msg">Herobrine byl odstraněn.</div>';
+  document.body.append(o);
+  tone("sawtooth", 55, 50, 3.5, 0.18); tone("sine", 82, 78, 3.5, 0.12); noise(3, "lowpass", 300, 0.15);
+  setTimeout(() => o.classList.add("out"), 3200);
+  setTimeout(() => o.remove(), 3900);
+  found("herobrine");
+}
+addEventListener("keydown", (e) => {
+  // Konami works anywhere outside text fields.
+  const inField = e.target.closest?.("input, textarea");
+  if (!inField) {
+    kIdx = e.key === KONAMI[kIdx] || e.key.toLowerCase() === KONAMI[kIdx] ? kIdx + 1 : e.key === KONAMI[0] ? 1 : 0;
+    if (kIdx === KONAMI.length) { kIdx = 0; creeper(); }
+  }
+  if (inField || e.key.length !== 1) return;
+  typed = (typed + e.key.toLowerCase()).slice(-12);
+  if (typed.endsWith("jeb_")) jeb();
+  else if (typed.endsWith("dinnerbone")) dinnerbone();
+  else if (typed.endsWith("herobrine")) herobrine();
+});
+
+// 5) Disco: 5 quick clicks on the cover
+let coverClicks = [], disco = 0;
+$(".player .cover").addEventListener("click", () => {
+  const now = Date.now();
+  coverClicks = coverClicks.filter((t) => now - t < 1500).concat(now);
+  if (coverClicks.length < 5 || disco) return;
+  coverClicks = [];
+  document.body.classList.add("disco");
+  let beat = 0;
+  disco = setInterval(() => {
+    tone("sine", 150, 45, 0.18, 0.5);
+    if (beat % 2) noise(0.06, "highpass", 7000, 0.18);
+    beat++;
+    document.body.style.setProperty("--disco", `${(beat * 47) % 360}deg`);
+  }, 250);
+  setTimeout(() => { clearInterval(disco); disco = 0; document.body.classList.remove("disco"); }, 10000);
+  toast("🪩 Disko!");
+  found("disco");
+});
+
+// 6) Diamond rain from the search box
+$("#search").addEventListener("keydown", (e) => {
+  if (e.key !== "Enter" || !/^(diamond|diamanty?|💎)$/i.test(e.target.value.trim())) return;
+  e.stopImmediatePropagation();
+  e.target.value = "";
+  for (let i = 0; i < 60; i++) {
+    const d = document.createElement("span");
+    d.className = "diamond";
+    d.textContent = "💎";
+    d.style.cssText = `left:${Math.random() * 100}vw;font-size:${16 + Math.random() * 22}px;animation-duration:${1.6 + Math.random() * 1.8}s;animation-delay:${Math.random() * 1.2}s;--rot:${Math.random() * 720 - 360}deg`;
+    document.body.append(d);
+    setTimeout(() => d.remove(), 4800);
+    if (i % 6 === 0) tone("sine", 1400 + Math.random() * 900, 1800 + Math.random() * 900, 0.15, 0.05, Math.random() * 1.8);
+  }
+  toast("💎 Našel jsi diamanty!");
+  found("diamonds");
+}, true);
+
+// 7) Shift + click on PLAY -> speedrun timer
+let srStart = 0, srRaf = 0;
+$("#playBtn").addEventListener("click", (e) => {
+  if (!e.shiftKey) return;
+  e.stopImmediatePropagation();
+  let el = $(".speedrun");
+  if (el) { cancelAnimationFrame(srRaf); el.classList.add("stop"); tone("square", 880, 880, 0.15, 0.08); tone("square", 1320, 1320, 0.3, 0.08, 0.15); setTimeout(() => el.remove(), 2500); return; }
+  el = document.createElement("div");
+  el.className = "speedrun";
+  el.title = "Shift + klik na HRÁT = stop";
+  document.body.append(el);
+  [0, 0.5, 1].forEach((d) => tone("square", 440, 440, 0.12, 0.08, d)); tone("square", 880, 880, 0.3, 0.1, 1.5);
+  const go = () => {
+    const ms = Math.max(0, performance.now() - srStart);
+    el.innerHTML = `⏱ <b>${String(Math.floor(ms / 60000)).padStart(2, "0")}:${String(Math.floor(ms / 1000) % 60).padStart(2, "0")}.${String(Math.floor(ms % 1000)).padStart(3, "0")}</b> <small>Any% · ${current.name}</small>`;
+    srRaf = requestAnimationFrame(go);
+  };
+  srStart = performance.now() + 1500;
+  go();
+  found("speedrun");
+}, true);
+
+// Counter in settings, with hints for what's still hidden.
+const HINTS = {
+  logo: "Logo vydrží hodně klikání…",
+  konami: "Staré herní kódy pořád fungují. ↑↑…",
+  jeb: "Jedna ovce v Minecraftu má hodně barev.",
+  dinnerbone: "Někteří moby chodí vzhůru nohama.",
+  herobrine: "Prý byl odstraněn. Zkus napsat jeho jméno.",
+  disco: "Obal písničky má rád rytmus.",
+  diamonds: "Hledej ty nejcennější rudy.",
+  speedrun: "Speedrunneři drží Shift.",
+};
+function renderSecretCard() {
+  const host = $('[data-page="settings"] .set-grid > div:last-child');
+  if (!host) return;
+  let card = $("#secretCard");
+  if (!card) { card = document.createElement("div"); card.id = "secretCard"; card.className = "card secret-card"; host.append(card); }
+  const f = foundSecrets(), total = Object.keys(SECRETS).length;
+  card.innerHTML = `<div class="sc-head"><b>🏆 Nalezená tajemství</b><span>${f.length}/${total}</span></div>
+    <div class="sc-bar"><i style="width:${(f.length / total) * 100}%"></i></div>
+    <div class="sc-list">${Object.keys(SECRETS).map((id) => f.includes(id) ? `<div class="ok">✓ ${SECRETS[id]}</div>` : `<div class="lock">🔒 ${HINTS[id]}</div>`).join("")}</div>`;
+}
+renderSecretCard();
+
+setHero(INSTS[0]);
+renderTrack();
+
+</script>
+</body>
+</html>

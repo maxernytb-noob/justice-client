@@ -1,0 +1,75 @@
+[package]
+name = "justice-client"
+version = "0.7.6"
+description = "Justice Client - Minecraft launcher for creators"
+edition = "2021"
+
+[lib]
+name = "justice_client_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["protocol-asset", "tray-icon"] }
+tauri-plugin-opener = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-single-instance = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json", "stream", "multipart"] }
+futures = "0.3"
+anyhow = "1"
+sha1 = "0.10"
+md-5 = "0.10"
+hex = "0.4"
+zip = { version = "2", default-features = false, features = ["deflate"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+dirs = "5"
+once_cell = "1"
+regex = "1"
+urlencoding = "2"
+tokio-tungstenite = { version = "0.24", features = ["rustls-tls-webpki-roots"] }
+sha2 = "0.10"
+base64 = "0.22"
+flate2 = "1"
+tar = "0.4"
+
+# Justice Clips (screen recording) is Windows-only: Desktop Duplication, WASAPI, Win32 windows.
+[target.'cfg(windows)'.dependencies]
+cpal = "0.15"
+windows = { version = "0.61", features = ["Win32_Graphics_Dxgi", "Win32_Graphics_Gdi", "Win32_Graphics_Dxgi_Common", "Win32_Foundation", "Foundation", "Media_Control", "Storage_Streams"] }
+windows-sys = { version = "0.59", features = [
+  "Win32_Foundation",
+  "Win32_Security",
+  "Win32_System_Pipes",
+  "Win32_System_IO",
+  "Win32_Storage_FileSystem",
+  "Win32_System_Threading",
+  "Win32_UI_WindowsAndMessaging",
+  "Win32_UI_Shell",
+  "Win32_Graphics_Gdi",
+  "Win32_Media_Audio",
+  "Win32_System_JobObjects",
+  "Win32_Globalization",
+] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+# Now playing on Linux: MPRIS over the session D-Bus (already in the tree through Tauri).
+[target.'cfg(target_os = "linux")'.dependencies]
+zbus = "5"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"

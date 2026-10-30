@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Justice SMP</title>
+<meta name="description" content="Justice SMP – Minecraft server. IP: justicesmp.online, Java 1.21.11.">
+<meta property="og:title" content="Justice SMP">
+<meta property="og:description" content="Minecraft server · IP justicesmp.online · Java 1.21.11">
+<meta property="og:image" content="https://justiceclient.online/icon.png">
+<link rel="icon" href="https://justiceclient.online/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#070708; --panel:#111114; --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.14); --text:#f4f4f6; --text2:#b6b6bf; --text3:#7c7c87; --red:#e11d38; --red2:#b8102a; --green:#22c55e; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; min-height:100%; background:var(--bg); color:var(--text); font-family:Inter, system-ui, sans-serif; }
+  body { display:flex; flex-direction:column; min-height:100vh; }
+  .glow { position:fixed; inset:0; pointer-events:none; background:radial-gradient(900px 500px at 50% -10%, rgba(225,29,56,.28), transparent 70%); }
+  main { position:relative; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:48px 16px; gap:22px; }
+  .logo { width:84px; height:84px; border-radius:22px; box-shadow:0 18px 50px rgba(225,29,56,.35); }
+  h1 { margin:0; font-size:clamp(40px, 9vw, 76px); font-weight:800; letter-spacing:-.04em; line-height:1; }
+  h1 em { font-style:normal; color:var(--red); }
+  .sub { margin:0; color:var(--text2); font-size:17px; max-width:520px; line-height:1.5; }
+  .ip { display:flex; align-items:center; gap:8px; padding:8px 8px 8px 20px; border-radius:16px; background:var(--panel); border:1px solid var(--line2); max-width:100%; }
+  .ip code { font:600 20px/1 ui-monospace, Consolas, monospace; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  button, .btn { font:inherit; font-weight:700; border:0; cursor:pointer; border-radius:12px; padding:12px 18px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:transform .15s, background .15s; }
+  button:active, .btn:active { transform:scale(.96); }
+  .copy { background:var(--red); color:#fff; }
+  .copy:hover { background:var(--red2); }
+  .status { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .chip { display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:999px; border:1px solid var(--line); background:rgba(255,255,255,.03); color:var(--text2); font-size:14px; }
+  .dot { width:9px; height:9px; border-radius:50%; background:var(--text3); }
+  .dot.on { background:var(--green); box-shadow:0 0 12px var(--green); }
+  .dot.off { background:var(--red); }
+  .ghost { background:transparent; color:var(--text); border:1px solid var(--line2); }
+  .ghost:hover { background:rgba(255,255,255,.05); }
+  .steps { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; width:min(720px, 100%); margin-top:10px; text-align:left; }
+  .step { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:16px; }
+  .step > b { display:block; margin-bottom:4px; }
+  .step span b { color:var(--text2); }
+  .step span { color:var(--text3); font-size:14px; line-height:1.45; }
+  .step i { font-style:normal; color:var(--red); font-weight:800; margin-right:6px; }
+  footer { position:relative; text-align:center; color:var(--text3); font-size:13px; padding:20px 16px 28px; }
+  footer a { color:var(--text2); }
+  .toast { position:fixed; left:50%; bottom:26px; transform:translate(-50%, 20px); opacity:0; background:#18181c; border:1px solid var(--line2); padding:10px 16px; border-radius:12px; transition:.25s; pointer-events:none; }
+  .toast.show { opacity:1; transform:translate(-50%, 0); }
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<main>
+  <img class="logo" src="https://justiceclient.online/icon.png" alt="">
+  <h1>Justice <em>SMP</em></h1>
+  <p class="sub">Minecraft server Justice. Připoj se přes Javu 1.21.11.</p>
+
+  <div class="ip">
+    <code id="ip">justicesmp.online</code>
+    <button class="copy" id="copy" type="button">Kopírovat IP</button>
+  </div>
+
+  <div class="status">
+    <span class="chip"><span class="dot" id="dot"></span><span id="state">Zjišťuji stav…</span></span>
+    <span class="chip">Java 1.21.11</span>
+  </div>
+
+  <a class="btn ghost" href="https://justiceclient.online/">Hrát přes Justice Client →</a>
+
+  <div class="steps">
+    <div class="step"><b><i>1</i>Spusť Minecraft</b><span>Java Edition 1.21.11, nebo rovnou Justice Client.</span></div>
+    <div class="step"><b><i>2</i>Přidej server</b><span>Multiplayer → Přidat server → adresa <b>justicesmp.online</b>.</span></div>
+    <div class="step"><b><i>3</i>Připoj se</b><span>Při prvním připojení si zaregistruj heslo přes <b>/register</b>.</span></div>
+  </div>
+</main>
+<footer>Justice SMP · <a href="https://justiceclient.online/">Justice Client</a></footer>
+<div class="toast" id="toast">IP zkopírována</div>
+<script>
+  const toast = document.getElementById("toast");
+  document.getElementById("copy").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText("justicesmp.online"); } catch {}
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 1600);
+  });
+  // Live status from a public status API.
+  fetch("https://api.mcsrvstat.us/3/justicesmp.online")
+    .then((r) => r.json())
+    .then((s) => {
+      const dot = document.getElementById("dot"), st = document.getElementById("state");
+      if (s.online) {
+        dot.classList.add("on");
+        st.textContent = `Online · ${s.players?.online ?? 0}/${s.players?.max ?? "?"} hráčů`;
+      } else {
+        dot.classList.add("off");
+        st.textContent = "Server je offline";
+      }
+    })
+    .catch(() => (document.getElementById("state").textContent = "Stav nejde zjistit"));
+</script>
+</body>
+</html>

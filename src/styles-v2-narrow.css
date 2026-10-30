@@ -1,0 +1,54 @@
+/* Narrow windows. Tiling window managers (Hyprland, sway, i3) ignore the minimum window size and
+   squeeze the launcher into whatever tile it gets, so every page has to work from 480 px up.
+   Anything hidden here is reachable another way (search lives in Ctrl+K, the account on its page). */
+
+/* Flex children that hold text shrink instead of pushing the row wider. */
+.titlebar > *, .page-head > *, .sec-h > *, .vtext, .icard, .srv-card, .fo-card { min-width: 0; }
+
+@media (max-width: 1023px) {
+  .page { padding: 18px 18px 32px; }
+  .home3 .vhero { margin: 0 -18px; }
+  .vhero .body, .vrow { padding-left: 24px; padding-right: 24px; }
+  .vhero h1 { font-size: 44px; }
+  .home-grid { grid-template-columns: 1fr; }
+  .hit-grid { grid-template-columns: 1fr; }
+  .srv-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .friends { grid-template-columns: 240px 1fr; }
+  .settings-layout { grid-template-columns: 1fr; }
+  .set-nav { display: none; }
+}
+
+@media (max-width: 767px) {
+  .titlebar { gap: 6px; }
+  .titlebar .tb-search { flex: 1 1 auto; min-width: 0; }
+  .titlebar .tb-search kbd { display: none; }
+  .titlebar .account-btn .small { display: none; }
+  .vhero h1 { font-size: 36px; }
+  .vcard { flex-basis: 170px; height: 104px; }
+  .friends { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .mplayer { width: min(360px, calc(100vw - 100px)); right: 12px; bottom: 12px; }
+  .party-prompts { width: auto; left: 88px; right: 12px; }
+  .menu { right: 12px; width: min(280px, calc(100vw - 24px)); }
+  .clip-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+  .modal-head, .modal-body, .modal-foot { padding-left: 14px; padding-right: 14px; }
+}
+
+@media (max-width: 639px) {
+  .page { padding: 14px 12px 28px; }
+  .home3 .vhero { margin: 0 -12px; min-height: calc(100vh - 74px); }
+  .vhero .body, .vrow { padding-left: 16px; padding-right: 16px; }
+  .vhero h1 { font-size: 30px; }
+  .vhero .friends-pill { right: 12px; }
+  .icards, .inst-grid, .gallery, .fo-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .srv-grid { grid-template-columns: 1fr; }
+  .search.sm .input, .clips-settings .setting select.input { width: 100%; }
+  .bg-preview { width: 120px; height: 68px; }
+  .theme-swatch { width: 88px; }
+  .modal-foot { flex-wrap: wrap; }
+  .page-head.v2 { flex-wrap: wrap; align-items: center; }
+  .page-head.v2 h1 { font-size: 24px; }
+  .kind-tabs { grid-template-columns: repeat(2, 1fr); }
+  .hit { flex-wrap: wrap; }
+  .hit > :nth-child(2) { flex: 1 1 200px; min-width: 0; }
+  .setting, .setting .row, .page .row { flex-wrap: wrap; }
+}

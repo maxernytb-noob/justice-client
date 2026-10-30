@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Podmínky použití · Justice Client</title>
+<link rel="icon" href="icon.png">
+<style>
+:root{--bg:#060607;--bg2:#0b0b0d;--panel:#111114;--panel2:#16161a;--line:#222228;--line2:#2d2d35;--text:#f1f0f3;--text2:#a6a4ad;--text3:#6d6b75;--red:#e11d38;--red2:#c8102e;--reddim:#2a0a10}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.7 "Segoe UI",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:420px;background:radial-gradient(600px 300px at 20% -10%,rgba(225,29,56,.16),transparent 70%);pointer-events:none}
+a{color:#ff5a72;text-decoration:none}a:hover{text-decoration:underline}
+header{position:sticky;top:0;z-index:5;background:rgba(6,6,7,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.bar{max-width:1180px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;color:var(--text);font:800 17px/1 ui-monospace,Consolas,monospace;letter-spacing:.08em}
+.brand i{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--red),var(--red2));display:grid;place-items:center;font-style:normal;font-size:15px;box-shadow:0 0 18px rgba(225,29,56,.35)}
+.brand:hover{text-decoration:none}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+.tabs a{color:var(--text2);padding:7px 12px;border-radius:999px;font-size:14px}
+.tabs a:hover{color:var(--text);background:var(--panel2);text-decoration:none}
+.tabs a[aria-current]{color:var(--text);background:var(--reddim);box-shadow:inset 0 0 0 1px rgba(225,29,56,.45)}
+.lang{display:flex;background:var(--panel);border:1px solid var(--line2);border-radius:999px;padding:3px}
+.lang button{all:unset;cursor:pointer;padding:4px 12px;border-radius:999px;font:600 12.5px/1.4 ui-monospace,Consolas,monospace;color:var(--text3)}
+.lang button[aria-pressed=true]{background:var(--red);color:#fff}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 16px 80px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;position:relative}
+.toc{position:sticky;top:84px;align-self:start;max-height:calc(100vh - 110px);overflow:auto;font-size:13.5px;line-height:1.45;display:flex;flex-direction:column;gap:2px}
+.toc b{font:600 11px/1 ui-monospace,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin:4px 0 10px}
+.toc a{color:var(--text2);padding:5px 10px;border-left:2px solid var(--line)}
+.toc a:hover{color:var(--text);border-color:var(--red);text-decoration:none}
+article{max-width:780px;min-width:0}
+h1{font-size:clamp(30px,5vw,44px);line-height:1.15;margin:0 0 18px;letter-spacing:-.02em}
+h2{font-size:22px;margin:44px 0 12px;padding-top:20px;border-top:1px solid var(--line)}
+h3{font-size:17px;margin:28px 0 8px;color:var(--text)}
+p,li{color:#d6d4db}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 16px;padding-left:22px}li{margin:4px 0}li::marker{color:var(--red)}
+strong{color:var(--text)}
+code{font:13px ui-monospace,Consolas,monospace;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.meta{color:var(--text3);font-size:14px}.meta strong{color:var(--text2)}
+.note{background:linear-gradient(180deg,rgba(225,29,56,.10),rgba(225,29,56,.04));border:1px solid rgba(225,29,56,.35);border-radius:14px;padding:14px 18px;margin:0 0 18px;font-size:14.5px;color:#e9c9cf}
+.note strong{color:#fff}
+mark.todo{background:rgba(250,204,21,.14);color:#fde68a;border:1px dashed rgba(250,204,21,.5);border-radius:6px;padding:0 5px;font-weight:600}
+.table{overflow-x:auto;margin:6px 0 20px;border:1px solid var(--line);border-radius:14px;background:var(--bg2)}
+table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5}
+th{text-align:left;font:600 11.5px/1.3 ui-monospace,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);background:var(--panel);padding:11px 14px;border-bottom:1px solid var(--line)}
+td{padding:11px 14px;border-top:1px solid var(--line);vertical-align:top;color:#d6d4db}
+tr:first-child td{border-top:0}
+footer{border-top:1px solid var(--line);color:var(--text3);font-size:13px;text-align:center;padding:28px 16px}
+html[data-lang=cs] [data-lang=en],html[data-lang=en] [data-lang=cs]{display:none!important}
+@media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0;padding-top:28px}.toc{display:none!important}}
+@media (max-width:640px){
+ .tabs{order:3;flex-basis:100%}
+ .table{border:0;background:none}
+ table,tbody,tr,td{display:block}thead{display:none}
+ tr{border:1px solid var(--line);border-radius:12px;background:var(--bg2);margin-bottom:10px;padding:6px 0}
+ td{border:0;padding:6px 14px}
+ td::before{content:attr(data-h);display:block;font:600 10.5px/1.4 ui-monospace,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}
+}
+@media print{header,.toc,footer{display:none}body{background:#fff;color:#000}body::before{display:none}p,li,td{color:#000}.wrap{display:block}}
+</style>
+<script>
+(function(){var l;try{l=new URLSearchParams(location.search).get("lang")||localStorage.getItem("jc-lang")}catch(e){}
+if(l!=="en"&&l!=="cs")l=(navigator.language||"cs").slice(0,2)==="cs"||(navigator.language||"").slice(0,2)==="sk"?"cs":"en";
+document.documentElement.dataset.lang=l;document.documentElement.lang=l;})();
+</script>
+</head>
+<body>
+<header><div class="bar">
+<a class="brand" href="https://justiceclient.online/"><i>J</i>JUSTICE</a>
+<nav class="tabs"><a href="terms.html" aria-current="page"><span data-lang="cs">Podmínky použití</span><span data-lang="en">Terms of Use</span></a><a href="privacy.html"><span data-lang="cs">Ochrana soukromí</span><span data-lang="en">Privacy</span></a><a href="content-policy.html"><span data-lang="cs">Pravidla obsahu</span><span data-lang="en">Content Policy</span></a></nav>
+<div class="lang" role="group" aria-label="Language"><button data-set="cs">CZ</button><button data-set="en">EN</button></div>
+</div></header>
+<main class="wrap"><nav class="toc" data-lang="cs"><b>Obsah</b><a href="#cs-1-kdo-jsme-a-co-tyto-podmínky-upravují">1. Kdo jsme a co tyto podmínky upravují</a><a href="#cs-2-souhlas-s-podmínkami">2. Souhlas s podmínkami</a><a href="#cs-3-věk">3. Věk</a><a href="#cs-4-licence-k-softwaru">4. Licence k softwaru</a><a href="#cs-5-vztah-k-minecraftu-mojangu-a-microsoftu">5. Vztah k Minecraftu, Mojangu a Microsoftu</a><a href="#cs-6-mody-modpacky-a-služby-třetích-stran">6. Mody, modpacky a služby třetích stran</a><a href="#cs-7-účet-justice-social">7. Účet Justice Social</a><a href="#cs-8-pravidla-chování">8. Pravidla chování</a><a href="#cs-9-uživatelský-obsah">9. Uživatelský obsah</a><a href="#cs-10-nahlašování-obsahu-a-moderace-dsa">10. Nahlašování obsahu a moderace (DSA)</a><a href="#cs-11-pomocník-s-umělou-inteligencí">11. Pomocník s umělou inteligencí</a><a href="#cs-12-dostupnost-a-změny-služeb">12. Dostupnost a změny Služeb</a><a href="#cs-13-vyloučení-záruk">13. Vyloučení záruk</a><a href="#cs-14-omezení-odpovědnosti">14. Omezení odpovědnosti</a><a href="#cs-15-ukončení">15. Ukončení</a><a href="#cs-16-změny-podmínek">16. Změny podmínek</a><a href="#cs-17-rozhodné-právo-a-spory">17. Rozhodné právo a spory</a><a href="#cs-18-závěrečná-ustanovení">18. Závěrečná ustanovení</a><a href="#cs-19-kontakt">19. Kontakt</a></nav><nav class="toc" data-lang="en"><b>Contents</b><a href="#en-1-who-we-are-and-what-these-terms-cover">1. Who we are and what these terms cover</a><a href="#en-2-accepting-the-terms">2. Accepting the terms</a><a href="#en-3-age">3. Age</a><a href="#en-4-software-licence">4. Software licence</a><a href="#en-5-relationship-to-minecraft-mojang-and-microsoft">5. Relationship to Minecraft, Mojang and Microsoft</a><a href="#en-6-mods-modpacks-and-third-party-services">6. Mods, modpacks and third-party services</a><a href="#en-7-justice-social-account">7. Justice Social account</a><a href="#en-8-rules-of-conduct">8. Rules of conduct</a><a href="#en-9-user-content">9. User content</a><a href="#en-10-reporting-content-and-moderation-dsa">10. Reporting content and moderation (DSA)</a><a href="#en-11-ai-helper">11. AI helper</a><a href="#en-12-availability-and-changes-to-the-services">12. Availability and changes to the Services</a><a href="#en-13-disclaimer-of-warranties">13. Disclaimer of warranties</a><a href="#en-14-limitation-of-liability">14. Limitation of liability</a><a href="#en-15-termination">15. Termination</a><a href="#en-16-changes-to-the-terms">16. Changes to the terms</a><a href="#en-17-governing-law-and-disputes">17. Governing law and disputes</a><a href="#en-18-final-provisions">18. Final provisions</a><a href="#en-19-contact">19. Contact</a></nav><article lang="cs" data-lang="cs"><h1>Podmínky použití Justice Client</h1>
+<aside class="note"><strong>Upozornění k návrhu:</strong> Tento text je návrh připravený bez právní kontroly a není právní radou. Před vydáním ho nechte zkontrolovat advokátem se znalostí českého a evropského spotřebitelského práva a práva digitálních služeb.</aside>
+<p class="meta"><strong>Verze:</strong> 2026-10-29 · <strong>Účinnost od:</strong> <mark class="todo">[DOPLNIT: datum účinnosti]</mark> · <strong>Závazné znění:</strong> české. Anglický překlad je jen informativní; při rozporu má přednost české znění.</p>
+<h2 id="cs-1-kdo-jsme-a-co-tyto-podmínky-upravují">1. Kdo jsme a co tyto podmínky upravují</h2>
+<p>1.1 Justice Client, Justice Mod a služba Justice Social (dále společně „<strong>Služby</strong>“) provozuje fyzická osoba <strong><mark class="todo">[DOPLNIT: jméno a příjmení provozovatele]</mark></strong>, adresa pro doručování <strong><mark class="todo">[DOPLNIT: adresa pro doručování]</mark></strong>, e-mail <strong><mark class="todo">[DOPLNIT: kontaktní e-mail]</mark></strong> (dále „<strong>provozovatel</strong>“, „<strong>my</strong>“).</p>
+<p>1.2 Služby tvoří zejména:</p>
+<ul><li><strong>Justice Client</strong> – launcher pro hru Minecraft pro Windows a Linux (připravuje se macOS), včetně automatických aktualizací, správy instancí, modů a modpacků, nahrávání klipů a přehrávače hudby;</li><li><strong>Justice Mod</strong> – modifikace hry pro loadery Fabric, NeoForge a Forge;</li><li><strong>Justice Social</strong> – online služba na našem serveru: účty, přátelé, chat, party, sdílení světů pro jednoho hráče přes relay, pláště, uložené skiny, žebříček, stav online („presence“), statistiky a – jakmile budou dostupné – zveřejněné klipy a pomocník pro modpacky využívající umělou inteligenci;</li><li>web <strong>https://justiceclient.online</strong>.</li></ul>
+<p>1.3 Tyto podmínky upravují vaše užívání Služeb. Zpracování osobních údajů popisují samostatné <a href="https://justiceclient.online/privacy">Zásady ochrany osobních údajů</a> a pravidla pro obsah a chování <a href="https://justiceclient.online/content-policy">Pravidla obsahu a komunity</a>, která jsou součástí těchto podmínek.</p>
+<p>1.4 Služby poskytujeme <strong>zdarma</strong>. Nejsou za ně žádné poplatky ani předplatné a neprodáváme v nich nic.</p>
+<h2 id="cs-2-souhlas-s-podmínkami">2. Souhlas s podmínkami</h2>
+<p>2.1 Podmínky přijímáte zaškrtnutím souhlasu v launcheru nebo tím, že Služby začnete používat. Pokud s nimi nesouhlasíte, Služby nepoužívejte a launcher odinstalujte.</p>
+<p>2.2 Části Služeb, které nevyžadují účet Justice Social (například samotný launcher nebo Justice Mod bez přihlášení k Justice Social), můžete používat bez ohledu na věk, pokud to dovolují podmínky hry Minecraft a pravidla vaší země.</p>
+<h2 id="cs-3-věk">3. Věk</h2>
+<p>3.1 Služby s účtem (Justice Social: účet, přátelé, chat, party, sdílení světů, zveřejňování klipů, pomocník s AI) smí sám používat jen ten, komu je <strong>alespoň 15 let</strong>. To odpovídá věku, od kterého může podle českého zákona o zpracování osobních údajů dát souhlas se službami informační společnosti sám.</p>
+<p>3.2 Je-li vám méně než 15 let, smíte Služby s účtem používat jen se souhlasem a pod dohledem rodiče nebo jiného zákonného zástupce. Zákonný zástupce odpovídá za to, jak dítě Služby používá, a může nás kdykoli požádat o zrušení účtu dítěte.</p>
+<p>3.3 Pokud zjistíme, že účet používá dítě mladší 15 let bez souhlasu zákonného zástupce, můžeme účet omezit nebo zrušit.</p>
+<h2 id="cs-4-licence-k-softwaru">4. Licence k softwaru</h2>
+<p>4.1 Udělujeme vám bezúplatnou, nevýhradní, nepřevoditelnou a odvolatelnou licenci instalovat a používat Justice Client a Justice Mod pro vaše osobní a nekomerční účely.</p>
+<p>4.2 Bez našeho souhlasu nesmíte software prodávat, pronajímat, šířit v upravené podobě pod naším jménem, odstraňovat z něj označení autorství ani obcházet jeho bezpečnostní opatření, ledaže vám to výslovně dovoluje zákon nebo licence, pod kterou je daná část softwaru vydána.</p>
+<p>4.3 Části softwaru jsou tvořeny knihovnami třetích stran pod jejich vlastními licencemi (open source). Tyto licence mají u těchto částí přednost.</p>
+<p>4.4 <strong>Automatické aktualizace.</strong> Launcher se aktualizuje sám, aby obsahoval opravy chyb a bezpečnosti a zůstal kompatibilní s hrou a se Službami. Aktualizace stahujeme výhradně z našich serverů a jsou podepsané. Některé funkce mohou bez aktuální verze přestat fungovat.</p>
+<h2 id="cs-5-vztah-k-minecraftu-mojangu-a-microsoftu">5. Vztah k Minecraftu, Mojangu a Microsoftu</h2>
+<p>5.1 <strong>NEJDE O OFICIÁLNÍ PRODUKT MINECRAFT. NENÍ SCHVÁLEN SPOLEČNOSTÍ MOJANG ANI MICROSOFT A NENÍ S NIMI SPOJEN.</strong> („NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.“)</p>
+<p>5.2 Minecraft je ochranná známka společnosti Mojang AB. Všechna práva ke hře Minecraft a jejím prvkům patří jejich vlastníkům. Názvy, obrázky a podklady ke hře používáme jen v rozsahu, který dovolují <a href="https://www.minecraft.net/usage-guidelines">Minecraft Usage Guidelines</a>.</p>
+<p>5.3 Justice Client neprodává hru Minecraft ani přístup k ní. K hraní potřebujete vlastní platnou licenci hry. Hru stahujeme z oficiálních serverů Mojangu a nijak ji nemodifikujeme mimo modů, které si sami zvolíte.</p>
+<p>5.4 Při používání hry se musíte řídit <a href="https://www.minecraft.net/eula">licenčními podmínkami Minecraftu (EULA)</a>, <a href="https://www.microsoft.com/servicesagreement">Microsoft Services Agreement</a> a pravidly serverů, na kterých hrajete.</p>
+<p>5.5 <strong>Offline („Justice“) účty</strong> slouží k hraní v režimu bez ověření (singleplayer, LAN, sdílené světy a servery, které offline režim samy povolují). Nejsou náhradou za koupi hry a nesmíte je používat k obcházení ochrany serverů ani licenčních podmínek Minecraftu. Doporučujeme si hru koupit.</p>
+<p>5.6 Přihlášení účtem Microsoft probíhá přímo u Microsoftu. Vaše heslo k účtu Microsoft nikdy nevidíme ani neukládáme.</p>
+<h2 id="cs-6-mody-modpacky-a-služby-třetích-stran">6. Mody, modpacky a služby třetích stran</h2>
+<p>6.1 Launcher umí vyhledat a stáhnout mody, modpacky, resource packy a shadery z webů třetích stran, zejména <strong>Modrinth</strong> a <strong>CurseForge</strong>. Tento obsah nevytváříme, nekontrolujeme a neodpovídáme za něj. Řídí se licencemi a podmínkami svých autorů a platforem; jste povinni je dodržovat (například nešířit cizí mody v rozporu s jejich licencí).</p>
+<p>6.2 Mody třetích stran mohou obsahovat chyby, být nekompatibilní, poškodit vaše světy nebo obsahovat škodlivý kód. Instalujete je na vlastní odpovědnost a doporučujeme zálohovat světy.</p>
+<p>6.3 <strong>Hudba.</strong> Přehrávač v launcheru a modul Now Playing v Justice Modu jen zobrazují a ovládají přehrávání aplikace, kterou máte v počítači (přes systémové rozhraní Windows / Linux). Aplikaci <strong>Sonolith</strong> uvádíme pouze jako doporučený přehrávač. Nejsme jejím provozovatelem ani partnerem a za ni neodpovídáme.</p>
+<p>6.4 <strong>Discord.</strong> Launcher může na vašem počítači předávat aplikaci Discord informaci o tom, co hrajete (Rich Presence). Tuto funkci lze vypnout v Nastavení. Discord je samostatná služba se svými podmínkami.</p>
+<p>6.5 Odkazy na weby a služby třetích stran (servery, Justice SMP, YouTube apod.) uvádíme pro pohodlí. Nejsou součástí Služeb a neodpovídáme za ně.</p>
+<h2 id="cs-7-účet-justice-social">7. Účet Justice Social</h2>
+<p>7.1 K účtu se přihlašujete účtem Microsoft (ověření proti serverům Mojangu) nebo offline účtem Justice se jménem a heslem.</p>
+<p>7.2 Odpovídáte za to, že:</p>
+<ul><li>uvedené údaje jsou pravdivé a jméno nevydává za někoho jiného (zejména za členy týmu Justice nebo známé osoby);</li><li>heslo uchováváte v tajnosti, nepoužíváte ho jinde a účet nesdílíte; o zneužití účtu nám dáte vědět bez zbytečného odkladu;</li><li>účet používáte jen vy (jeden účet = jedna osoba).</li></ul>
+<p>7.3 Za činnost provedenou z vašeho účtu odpovídáte, ledaže prokážete, že k ní došlo bez vašeho zavinění.</p>
+<p>7.4 Uživatelská jména a jiný veřejný obsah profilu nesmí porušovat <a href="https://justiceclient.online/content-policy">Pravidla obsahu a komunity</a>.</p>
+<h2 id="cs-8-pravidla-chování">8. Pravidla chování</h2>
+<p>Při používání Služeb nesmíte zejména:</p>
+<ul><li>porušovat právní předpisy, práva třetích osob nebo tyto podmínky;</li><li>zveřejňovat či posílat nelegální obsah (např. sexuální obsah s nezletilými, podněcování k násilí či nenávisti, propagaci terorismu, výhrůžky, cizí osobní údaje bez souhlasu, obsah porušující autorská práva);</li><li>obtěžovat, šikanovat, vyhrožovat, pronásledovat nebo zastrašovat jiné uživatele, vydávat se za někoho jiného;</li><li>posílat spam, reklamu, řetězové zprávy, phishing nebo škodlivé soubory a odkazy;</li><li>používat Služby k vytváření, šíření nebo propagaci <strong>cheatů</strong>, hacked clientů a jiných nástrojů dávajících nepovolenou výhodu na serverech, které je zakazují;</li><li>zasahovat do provozu Služeb – útočit na servery, přetěžovat je, automatizovaně je vytěžovat, obcházet omezení, zkoušet zabezpečení bez našeho svolení nebo zneužívat chyby (chyby nám prosím nahlaste);</li><li>vytvářet účty hromadně nebo za účelem obejití zablokování;</li><li>zneužívat systém nahlašování (vědomě nepravdivá nahlášení).</li></ul>
+<p>Podrobnosti jsou v <a href="https://justiceclient.online/content-policy">Pravidlech obsahu a komunity</a>.</p>
+<h2 id="cs-9-uživatelský-obsah">9. Uživatelský obsah</h2>
+<p>9.1 <strong>Uživatelským obsahem</strong> se rozumí vše, co do Služeb nahrajete nebo pošlete: zprávy v chatu a soubory v nich, klipy, jejich popisy, hashtagy a označení hráčů, skiny, volba pláště, text profilu (bio, status, banner), jméno světa a další.</p>
+<p>9.2 <strong>Vaše práva.</strong> Uživatelský obsah zůstává váš. My k němu žádná vlastnická práva nezískáváme.</p>
+<p>9.3 <strong>Vaše záruka.</strong> Odpovídáte za to, že k obsahu máte potřebná práva (autorská práva, práva k hudbě, k podobě a hlasu osob, které jsou v klipu zachyceny) a že jeho zveřejnění neporušuje zákon ani tyto podmínky. Pokud kvůli vašemu obsahu, který byl nahrán v rozporu s těmito podmínkami, uplatní třetí osoba nárok vůči nám, poskytnete nám přiměřenou součinnost; od spotřebitelů nepožadujeme víc, než dovoluje zákon.</p>
+<p>9.4 <strong>Licence pro nás.</strong> Nahráním obsahu nám udělujete bezúplatnou, nevýhradní, celosvětovou licenci obsah ukládat, technicky upravovat (např. zmenšit, převést formát, vytvořit náhled), rozmnožovat a zpřístupňovat ostatním uživatelům v rozsahu, jaký jste zvolili (konkrétnímu příteli, party, nebo veřejně u zveřejněných klipů), a to výhradně za účelem provozu Služeb. Licence trvá, dokud obsah nesmažete vy nebo my; poté obsah odstraníme bez zbytečného odkladu, nejpozději v době uvedené v Zásadách ochrany osobních údajů (zálohy mohou dočasně přetrvat). Licence nezahrnuje použití obsahu k reklamě ani jeho prodej.</p>
+<p>9.5 <strong>Licence pro ostatní uživatele.</strong> Zveřejněné klipy a veřejné části profilu si mohou ostatní uživatelé prohlížet v rámci Služeb. Mimo Služby je smí dál šířit jen s vaším svolením nebo pokud to dovoluje zákon.</p>
+<p>9.6 <strong>Omezení.</strong> Klip smí mít nejvýše přibližně 60 sekund a 100 MB (přesné limity uvádí launcher). Soubory v chatu se automaticky mažou po 30 dnech. Obsah nepředem nekontrolujeme, ale můžeme ho odstranit podle článku 10.</p>
+<p>9.7 Doporučujeme si důležitý obsah zálohovat. Služby nejsou úložiště a obsah se může ztratit.</p>
+<h2 id="cs-10-nahlašování-obsahu-a-moderace-dsa">10. Nahlašování obsahu a moderace (DSA)</h2>
+<p>10.1 <strong>Kontaktní místo.</strong> Pro uživatele i orgány veřejné moci je jednotným kontaktním místem podle nařízení (EU) 2022/2065 o digitálních službách (DSA) e-mail <strong><mark class="todo">[DOPLNIT: e-mail pro nahlašování, např. report@justiceclient.online]</mark></strong>. Komunikovat můžete česky nebo anglicky.</p>
+<p>10.2 <strong>Nahlášení.</strong> Obsah, který považujete za nezákonný nebo v rozporu s pravidly, nahlaste tlačítkem „Nahlásit“ v launcheru (je-li u daného obsahu dostupné) nebo e-mailem. Nahlášení by mělo obsahovat:</p>
+<ul><li>vysvětlení, proč obsah považujete za nezákonný nebo v rozporu s pravidly;</li><li>přesnou identifikaci obsahu (odkaz, jméno hráče, čas zprávy);</li><li>vaše jméno a e-mail (to neplatí u nahlášení obsahu souvisejícího se sexuálním zneužíváním dětí);</li><li>prohlášení, že nahlášení podáváte v dobré víře a údaje v něm jsou podle vás přesné a úplné.</li></ul>
+<p>10.3 Přijetí nahlášení potvrdíme, rozhodneme včas, pečlivě a nestranně a o rozhodnutí vás informujeme. Automatizované nástroje k rozhodování nepoužíváme; pokud bychom je začali používat, uvedeme to.</p>
+<p>10.4 <strong>Opatření.</strong> Při porušení zákona nebo pravidel můžeme obsah odstranit nebo znepřístupnit, omezit viditelnost, varovat uživatele, dočasně omezit funkce (např. chat nebo zveřejňování klipů), účet dočasně pozastavit nebo zrušit. Volíme opatření přiměřené závažnosti a opakování porušení.</p>
+<p>10.5 <strong>Odůvodnění.</strong> Uživateli, jehož obsah nebo účet jsme omezili, sdělíme (pokud to není v rozporu se zákonem nebo pokynem orgánu) jaké opatření jsme přijali, z jakého důvodu, na základě jakých skutečností a jaké má možnosti nápravy.</p>
+<p>10.6 <strong>Odvolání.</strong> Proti našemu rozhodnutí (i proti rozhodnutí nahlášení neřešit) se můžete do 6 měsíců odvolat e-mailem na kontaktní místo. Odvolání posoudíme znovu a bez zbytečného odkladu; výsledek vám sdělíme. Tím není dotčeno vaše právo obrátit se na soud nebo na orgán dohledu (v Česku na Český telekomunikační úřad jako koordinátora digitálních služeb).</p>
+<p>10.7 <strong>Zjevně nezákonný obsah a zneužívání.</strong> Uživatelům, kteří často zveřejňují zjevně nezákonný obsah, můžeme po předchozím varování služby na přiměřenou dobu pozastavit. Totéž platí pro osoby, které často podávají zjevně neopodstatněná nahlášení.</p>
+<p>10.8 Pokud se dozvíme o obsahu, který zakládá podezření z trestného činu ohrožujícího život nebo bezpečnost osob, informujeme o tom příslušné orgány.</p>
+<h2 id="cs-11-pomocník-s-umělou-inteligencí">11. Pomocník s umělou inteligencí</h2>
+<p>11.1 Pomocník pro modpacky (jakmile bude dostupný) je <strong>chatbot s umělou inteligencí, nikoli člověk</strong>. Vaše dotazy přeposíláme přes náš server poskytovateli jazykového modelu (viz Zásady ochrany osobních údajů).</p>
+<p>11.2 Odpovědi AI mohou být nepřesné, neúplné nebo zastaralé. Před instalací doporučených modů a před změnou nastavení je ověřte. Nevkládejte do dotazů osobní údaje, hesla ani jiné citlivé informace.</p>
+<p>11.3 Pomocníka nesmíte používat k vytváření nezákonného nebo škodlivého obsahu ani k obcházení jeho omezení. Počet dotazů můžeme omezit.</p>
+<h2 id="cs-12-dostupnost-a-změny-služeb">12. Dostupnost a změny Služeb</h2>
+<p>12.1 Služby provozuje jednotlivec ve svém volném čase. Nezaručujeme jejich nepřetržitou dostupnost. Můžeme je kdykoli upravit, omezit, dočasně vypnout (např. kvůli údržbě nebo bezpečnosti) nebo ukončit. O ukončení online částí Služeb vás budeme, pokud to bude možné, informovat alespoň 30 dní předem, abyste si mohli stáhnout svůj obsah.</p>
+<p>12.2 Funkce, které jsou v launcheru označeny jako připravované, testovací nebo beta, nemusí fungovat správně.</p>
+<h2 id="cs-13-vyloučení-záruk">13. Vyloučení záruk</h2>
+<p>13.1 Služby poskytujeme <strong>zdarma a „tak, jak jsou“ a „jak jsou dostupné“</strong>. V rozsahu, který dovoluje právo, neposkytujeme žádné záruky nad rámec těch, které nelze ze zákona vyloučit – zejména nezaručujeme, že Služby budou bez chyb, kompatibilní s každým modem, serverem či verzí hry, že zvýší výkon hry, nebo že je nikdy neovlivní zásah třetí strany (Mojang, Microsoft, Modrinth, CurseForge, poskytovatel serveru).</p>
+<p>13.2 <strong>Spotřebitelé.</strong> Jste-li spotřebitel, nic v těchto podmínkách neomezuje vaše práva, která vám dávají kogentní ustanovení zákona – zejména práva z vadného plnění u digitálního obsahu a služeb podle občanského zákoníku, pokud se na vás vztahují – ani ochranu, kterou vám poskytuje právo státu vašeho obvyklého bydliště.</p>
+<h2 id="cs-14-omezení-odpovědnosti">14. Omezení odpovědnosti</h2>
+<p>14.1 V rozsahu, který dovoluje právo, neodpovídáme za:</p>
+<ul><li>ztrátu nebo poškození herních světů, nastavení, instancí, klipů nebo jiných dat (zálohujte je);</li><li>škodu způsobenou mody, modpacky, shadery a jiným obsahem třetích stran nebo službami třetích stran;</li><li>obsah a jednání jiných uživatelů;</li><li>ušlý zisk, ztrátu herního postupu, zablokování na herním serveru nebo nepřímé škody;</li><li>nedostupnost Služeb nebo ztrátu dat způsobenou okolnostmi, které nemůžeme ovlivnit.</li></ul>
+<p>14.2 <strong>Co nevylučujeme.</strong> Neomezujeme ani nevylučujeme odpovědnost za újmu na životě, zdraví nebo jiných přirozených právech člověka, za škodu způsobenou úmyslně nebo z hrubé nedbalosti, ani jinou odpovědnost, kterou podle zákona nelze vyloučit nebo omezit (zejména vůči spotřebiteli).</p>
+<p>14.3 Protože Služby poskytujeme zdarma, je naše případná odpovědnost tam, kde to zákon dovoluje, omezena na částku <strong>1 000 Kč</strong> za všechny nároky dohromady; toto omezení se neuplatní v případech podle bodu 14.2.</p>
+<h2 id="cs-15-ukončení">15. Ukončení</h2>
+<p>15.1 Používání Služeb můžete kdykoli ukončit – odinstalovat launcher a požádat o zrušení účtu Justice Social e-mailem na <strong><mark class="todo">[DOPLNIT: kontaktní e-mail]</mark></strong> (nebo v launcheru, až bude tato funkce dostupná). Účet a s ním spojená data smažeme podle Zásad ochrany osobních údajů.</p>
+<p>15.2 Účet můžeme omezit nebo zrušit, pokud vážně nebo opakovaně porušujete tyto podmínky nebo zákon, pokud to vyžaduje bezpečnost Služeb nebo jiných uživatelů, na pokyn orgánu, nebo pokud Služby ukončujeme. Postupujeme podle článku 10 a rozhodnutí vám zdůvodníme.</p>
+<p>15.3 Účty, které nebyly použity déle než <strong>24 měsíců</strong>, můžeme po předchozím upozornění v launcheru nebo e-mailem (je-li znám) zrušit.</p>
+<p>15.4 Ustanovení, která mají ze své povahy trvat i po ukončení (např. licence k již sdílenému obsahu v nezbytném rozsahu, omezení odpovědnosti, rozhodné právo), platí i nadále.</p>
+<h2 id="cs-16-změny-podmínek">16. Změny podmínek</h2>
+<p>16.1 Podmínky můžeme měnit, zejména kvůli novým funkcím, změně právních předpisů, bezpečnosti nebo požadavkům třetích stran (Mojang, Microsoft, poskytovatelé služeb).</p>
+<p>16.2 O podstatné změně vás informujeme v launcheru (a na webu) nejméně <strong>14 dní</strong> před její účinností, s výjimkou změn nutných ze zákona nebo z bezpečnostních důvodů a změn, které se týkají jen nových funkcí. Novou verzi budete muset v launcheru <strong>znovu odsouhlasit</strong>; do té doby nebudou funkce vyžadující účet dostupné.</p>
+<p>16.3 Pokud se změnou nesouhlasíte, můžete Služby přestat používat a požádat o zrušení účtu. Žádné poplatky ani sankce vám za to nevzniknou.</p>
+<p>16.4 Předchozí verze podmínek zveřejňujeme na webu nebo vám je na požádání zašleme.</p>
+<h2 id="cs-17-rozhodné-právo-a-spory">17. Rozhodné právo a spory</h2>
+<p>17.1 Tyto podmínky a vztahy z nich vzniklé se řídí právem <strong>České republiky</strong>, zejména zákonem č. 89/2012 Sb., občanský zákoník. Jste-li spotřebitel s obvyklým bydlištěm v jiném státě, nepřichází tím o ochranu, kterou vám poskytují kogentní ustanovení práva tohoto státu.</p>
+<p>17.2 Spory rozhodují příslušné soudy České republiky. Jste-li spotřebitel s bydlištěm v EU, můžete nás žalovat i u soudu svého bydliště a my vás můžeme žalovat jen u soudu vašeho bydliště.</p>
+<p>17.3 Než se obrátíte na soud, napište nám prosím – většinu věcí vyřešíme dohodou. Jste-li spotřebitel a vztahují-li se na nás pravidla mimosoudního řešení spotřebitelských sporů, je příslušným subjektem Česká obchodní inspekce (https://adr.coi.gov.cz).</p>
+<h2 id="cs-18-závěrečná-ustanovení">18. Závěrečná ustanovení</h2>
+<p>18.1 Je-li některé ustanovení neplatné nebo nevymahatelné, ostatní ustanovení tím nejsou dotčena.</p>
+<p>18.2 Pokud nějaké právo z těchto podmínek hned neuplatníme, neznamená to, že se ho vzdáváme.</p>
+<p>18.3 Svá práva a povinnosti z těchto podmínek můžeme převést na jiného provozovatele Služeb; o takovém převodu vás předem informujeme a pokud s ním nesouhlasíte, můžete Služby přestat používat.</p>
+<h2 id="cs-19-kontakt">19. Kontakt</h2>
+<ul><li>Provozovatel: <strong><mark class="todo">[DOPLNIT: jméno a příjmení provozovatele]</mark></strong></li><li>Adresa pro doručování: <strong><mark class="todo">[DOPLNIT: adresa pro doručování]</mark></strong></li><li>E-mail: <strong><mark class="todo">[DOPLNIT: kontaktní e-mail]</mark></strong></li><li>Kontaktní místo DSA / nahlašování: <strong><mark class="todo">[DOPLNIT: e-mail pro nahlašování]</mark></strong></li></ul></article><article lang="en" data-lang="en"><h1>Justice Client Terms of Use</h1>
+<aside class="note"><strong>Draft notice:</strong> This text is a draft prepared without legal review and is not legal advice. Before release, have it reviewed by a lawyer familiar with Czech and EU consumer law and the law of digital services.</aside>
+<p class="meta"><strong>Version:</strong> 2026-10-29 · <strong>Effective from:</strong> <mark class="todo">[DOPLNIT: effective date]</mark> · <strong>Binding version:</strong> Czech. This English translation is for information only; if the versions conflict, the Czech version prevails.</p>
+<h2 id="en-1-who-we-are-and-what-these-terms-cover">1. Who we are and what these terms cover</h2>
+<p>1.1 Justice Client, Justice Mod and the Justice Social service (together the "<strong>Services</strong>") are operated by a natural person, <strong><mark class="todo">[DOPLNIT: operator's full name]</mark></strong>, address for correspondence <strong><mark class="todo">[DOPLNIT: address for correspondence]</mark></strong>, e-mail <strong><mark class="todo">[DOPLNIT: contact e-mail]</mark></strong> (the "<strong>operator</strong>", "<strong>we</strong>").</p>
+<p>1.2 The Services consist mainly of:</p>
+<ul><li><strong>Justice Client</strong> – a launcher for the game Minecraft for Windows and Linux (macOS in preparation), including automatic updates, management of instances, mods and modpacks, clip recording and a music player;</li><li><strong>Justice Mod</strong> – a game modification for the Fabric, NeoForge and Forge loaders;</li><li><strong>Justice Social</strong> – an online service on our server: accounts, friends, chat, parties, sharing of singleplayer worlds via relay, capes, stored skins, a leaderboard, online status ("presence"), statistics and – once available – published clips and an AI-powered modpack helper;</li><li>the website <strong>https://justiceclient.online</strong>.</li></ul>
+<p>1.3 These terms govern your use of the Services. The processing of personal data is described in the separate <a href="https://justiceclient.online/privacy">Privacy Policy</a>, and rules for content and behaviour in the <a href="https://justiceclient.online/content-policy">Content and Community Policy</a>, which forms part of these terms.</p>
+<p>1.4 The Services are <strong>free of charge</strong>. There are no fees or subscriptions and we sell nothing in them.</p>
+<h2 id="en-2-accepting-the-terms">2. Accepting the terms</h2>
+<p>2.1 You accept these terms by ticking the consent box in the launcher or by starting to use the Services. If you do not agree, do not use the Services and uninstall the launcher.</p>
+<p>2.2 Parts of the Services that do not require a Justice Social account (for example the launcher itself or Justice Mod without signing in to Justice Social) may be used regardless of age, as far as the Minecraft terms and the rules of your country allow.</p>
+<h2 id="en-3-age">3. Age</h2>
+<p>3.1 Services with an account (Justice Social: account, friends, chat, parties, world sharing, publishing clips, the AI helper) may be used independently only by people who are <strong>at least 15 years old</strong>. This is the age from which Czech law allows a person to consent to information society services on their own.</p>
+<p>3.2 If you are under 15, you may use the Services with an account only with the consent and under the supervision of a parent or other legal guardian. The guardian is responsible for how the child uses the Services and may ask us to close the child's account at any time.</p>
+<p>3.3 If we find that an account is used by a child under 15 without a guardian's consent, we may restrict or close it.</p>
+<h2 id="en-4-software-licence">4. Software licence</h2>
+<p>4.1 We grant you a free, non-exclusive, non-transferable and revocable licence to install and use Justice Client and Justice Mod for your personal, non-commercial purposes.</p>
+<p>4.2 Without our consent you may not sell or rent the software, distribute modified versions under our name, remove authorship notices or circumvent its security measures, unless the law or the licence under which a given part of the software is released expressly allows it.</p>
+<p>4.3 Parts of the software are third-party libraries under their own (open-source) licences. Those licences take precedence for those parts.</p>
+<p>4.4 <strong>Automatic updates.</strong> The launcher updates itself so that it contains bug and security fixes and stays compatible with the game and the Services. Updates are downloaded only from our servers and are signed. Some features may stop working without the current version.</p>
+<h2 id="en-5-relationship-to-minecraft-mojang-and-microsoft">5. Relationship to Minecraft, Mojang and Microsoft</h2>
+<p>5.1 <strong>NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.</strong></p>
+<p>5.2 Minecraft is a trademark of Mojang AB. All rights to Minecraft and its elements belong to their owners. We use game names, images and assets only as permitted by the <a href="https://www.minecraft.net/usage-guidelines">Minecraft Usage Guidelines</a>.</p>
+<p>5.3 Justice Client does not sell Minecraft or access to it. You need your own valid game licence to play. The game is downloaded from Mojang's official servers and we do not modify it beyond the mods you choose yourself.</p>
+<p>5.4 When using the game you must comply with the <a href="https://www.minecraft.net/eula">Minecraft End User Licence Agreement (EULA)</a>, the <a href="https://www.microsoft.com/servicesagreement">Microsoft Services Agreement</a> and the rules of the servers you play on.</p>
+<p>5.5 <strong>Offline ("Justice") accounts</strong> are intended for playing without authentication (singleplayer, LAN, shared worlds and servers that themselves allow offline mode). They are not a substitute for buying the game and you must not use them to bypass server protection or the Minecraft licence terms. We recommend buying the game.</p>
+<p>5.6 Microsoft sign-in happens directly with Microsoft. We never see or store your Microsoft account password.</p>
+<h2 id="en-6-mods-modpacks-and-third-party-services">6. Mods, modpacks and third-party services</h2>
+<p>6.1 The launcher can search for and download mods, modpacks, resource packs and shaders from third-party websites, mainly <strong>Modrinth</strong> and <strong>CurseForge</strong>. We do not create, check or take responsibility for that content. It is governed by the licences and terms of its authors and platforms, which you must respect (for example, do not redistribute mods contrary to their licence).</p>
+<p>6.2 Third-party mods may contain bugs, be incompatible, damage your worlds or contain malicious code. You install them at your own risk; we recommend backing up your worlds.</p>
+<p>6.3 <strong>Music.</strong> The launcher's player and Justice Mod's Now Playing module only display and control playback of an application on your computer (via the Windows / Linux system interface). <strong>Sonolith</strong> is mentioned only as a recommended player. We do not operate it, are not its partner and are not responsible for it.</p>
+<p>6.4 <strong>Discord.</strong> The launcher may pass information about what you are playing to the Discord application on your computer (Rich Presence). You can turn this off in Settings. Discord is a separate service with its own terms.</p>
+<p>6.5 Links to third-party websites and services (servers, Justice SMP, YouTube, etc.) are provided for convenience. They are not part of the Services and we are not responsible for them.</p>
+<h2 id="en-7-justice-social-account">7. Justice Social account</h2>
+<p>7.1 You sign in with a Microsoft account (verified against Mojang's servers) or with an offline Justice account with a name and password.</p>
+<p>7.2 You are responsible for ensuring that:</p>
+<ul><li>the details you provide are true and your name does not impersonate anyone else (in particular Justice team members or well-known people);</li><li>you keep your password secret, do not reuse it elsewhere and do not share your account; you tell us without undue delay if your account is misused;</li><li>only you use the account (one account = one person).</li></ul>
+<p>7.3 You are responsible for activity carried out from your account unless you prove it happened through no fault of yours.</p>
+<p>7.4 User names and other public profile content must not violate the <a href="https://justiceclient.online/content-policy">Content and Community Policy</a>.</p>
+<h2 id="en-8-rules-of-conduct">8. Rules of conduct</h2>
+<p>When using the Services you must not in particular:</p>
+<ul><li>break the law, the rights of others or these terms;</li><li>publish or send illegal content (e.g. sexual content involving minors, incitement to violence or hatred, promotion of terrorism, threats, other people's personal data without consent, copyright-infringing content);</li><li>harass, bully, threaten, stalk or intimidate other users, or impersonate anyone;</li><li>send spam, advertising, chain messages, phishing or malicious files and links;</li><li>use the Services to create, distribute or promote <strong>cheats</strong>, hacked clients and other tools that give an unfair advantage on servers that forbid them;</li><li>interfere with the Services – attack or overload the servers, scrape them automatically, circumvent limits, test security without our permission or exploit bugs (please report bugs to us);</li><li>create accounts in bulk or to evade a ban;</li><li>abuse the reporting system (knowingly false reports).</li></ul>
+<p>Details are in the <a href="https://justiceclient.online/content-policy">Content and Community Policy</a>.</p>
+<h2 id="en-9-user-content">9. User content</h2>
+<p>9.1 <strong>User content</strong> means anything you upload or send to the Services: chat messages and files in them, clips, their descriptions, hashtags and player tags, skins, cape selection, profile text (bio, status, banner), world names and more.</p>
+<p>9.2 <strong>Your rights.</strong> User content remains yours. We acquire no ownership rights in it.</p>
+<p>9.3 <strong>Your warranty.</strong> You are responsible for having the necessary rights to the content (copyright, rights to music, to the likeness and voice of people captured in a clip) and for ensuring that publishing it does not violate the law or these terms. If a third party brings a claim against us because of your content uploaded in breach of these terms, you will reasonably cooperate with us; from consumers we do not require more than the law allows.</p>
+<p>9.4 <strong>Licence to us.</strong> By uploading content you grant us a free, non-exclusive, worldwide licence to store the content, technically adapt it (e.g. downscale, convert the format, create a thumbnail), reproduce it and make it available to other users to the extent you choose (a specific friend, a party, or publicly for published clips), solely to operate the Services. The licence lasts until you or we delete the content; we then remove it without undue delay, at the latest within the period stated in the Privacy Policy (backups may persist temporarily). The licence does not cover using the content for advertising or selling it.</p>
+<p>9.5 <strong>Licence to other users.</strong> Other users may view published clips and public profile parts within the Services. Outside the Services they may redistribute them only with your permission or where the law allows.</p>
+<p>9.6 <strong>Limits.</strong> A clip may be at most about 60 seconds and 100 MB (exact limits are shown in the launcher). Files in chat are deleted automatically after 30 days. We do not check content in advance, but we may remove it under section 10.</p>
+<p>9.7 We recommend backing up important content. The Services are not a storage service and content may be lost.</p>
+<h2 id="en-10-reporting-content-and-moderation-dsa">10. Reporting content and moderation (DSA)</h2>
+<p>10.1 <strong>Point of contact.</strong> The single point of contact for users and public authorities under Regulation (EU) 2022/2065 on digital services (DSA) is the e-mail <strong><mark class="todo">[DOPLNIT: reporting e-mail, e.g. report@justiceclient.online]</mark></strong>. You can communicate with us in Czech or English.</p>
+<p>10.2 <strong>Reporting.</strong> Report content you consider illegal or in breach of the rules using the "Report" button in the launcher (where available for the content) or by e-mail. A report should contain:</p>
+<ul><li>an explanation of why you consider the content illegal or in breach of the rules;</li><li>precise identification of the content (link, player name, time of the message);</li><li>your name and e-mail (not required for reports of content related to child sexual abuse);</li><li>a statement that you submit the report in good faith and that you believe the information in it is accurate and complete.</li></ul>
+<p>10.3 We will confirm receipt, decide in a timely, diligent and impartial manner and inform you of the decision. We do not use automated tools to make decisions; if we start doing so, we will say so.</p>
+<p>10.4 <strong>Measures.</strong> For breaches of the law or the rules we may remove or disable access to content, limit its visibility, warn the user, temporarily restrict features (e.g. chat or publishing clips), suspend or close the account. We choose a measure proportionate to the seriousness and repetition of the breach.</p>
+<p>10.5 <strong>Statement of reasons.</strong> We will tell a user whose content or account we restricted (unless this conflicts with the law or an order of an authority) what measure we took, why, on what facts, and what redress is available.</p>
+<p>10.6 <strong>Appeal.</strong> You may appeal our decision (including a decision not to act on a report) by e-mail to the point of contact within 6 months. We will review the appeal again without undue delay and let you know the outcome. This does not affect your right to go to court or to a supervisory authority (in Czechia, the Czech Telecommunication Office as Digital Services Coordinator).</p>
+<p>10.7 <strong>Manifestly illegal content and abuse.</strong> Users who frequently publish manifestly illegal content may, after a prior warning, have the Services suspended for a reasonable period. The same applies to people who frequently submit manifestly unfounded reports.</p>
+<p>10.8 If we become aware of content giving rise to a suspicion of a criminal offence threatening the life or safety of persons, we will inform the competent authorities.</p>
+<h2 id="en-11-ai-helper">11. AI helper</h2>
+<p>11.1 The modpack helper (once available) is an <strong>AI chatbot, not a human</strong>. Your questions are forwarded through our server to a language-model provider (see the Privacy Policy).</p>
+<p>11.2 AI answers may be inaccurate, incomplete or outdated. Verify them before installing recommended mods or changing settings. Do not put personal data, passwords or other sensitive information into your questions.</p>
+<p>11.3 You must not use the helper to create illegal or harmful content or to circumvent its restrictions. We may limit the number of questions.</p>
+<h2 id="en-12-availability-and-changes-to-the-services">12. Availability and changes to the Services</h2>
+<p>12.1 The Services are run by an individual in their free time. We do not guarantee uninterrupted availability. We may modify, restrict, temporarily switch off (e.g. for maintenance or security) or discontinue them at any time. Where possible, we will announce the discontinuation of the online parts of the Services at least 30 days in advance so you can download your content.</p>
+<p>12.2 Features marked in the launcher as upcoming, test or beta may not work correctly.</p>
+<h2 id="en-13-disclaimer-of-warranties">13. Disclaimer of warranties</h2>
+<p>13.1 The Services are provided <strong>free of charge, "as is" and "as available"</strong>. To the extent permitted by law, we give no warranties beyond those that cannot be excluded by law – in particular we do not warrant that the Services will be error-free, compatible with every mod, server or game version, that they will improve game performance, or that they will never be affected by third parties (Mojang, Microsoft, Modrinth, CurseForge, a server provider).</p>
+<p>13.2 <strong>Consumers.</strong> If you are a consumer, nothing in these terms limits the rights given to you by mandatory provisions of law – in particular rights in respect of defective digital content and services under the Civil Code, where they apply to you – or the protection afforded by the law of the country of your habitual residence.</p>
+<h2 id="en-14-limitation-of-liability">14. Limitation of liability</h2>
+<p>14.1 To the extent permitted by law, we are not liable for:</p>
+<ul><li>loss of or damage to game worlds, settings, instances, clips or other data (back them up);</li><li>damage caused by mods, modpacks, shaders and other third-party content or third-party services;</li><li>content and conduct of other users;</li><li>lost profit, loss of game progress, bans on game servers or indirect damage;</li><li>unavailability of the Services or loss of data caused by circumstances beyond our control.</li></ul>
+<p>14.2 <strong>What we do not exclude.</strong> We do not limit or exclude liability for harm to life, health or other natural rights of a person, for damage caused intentionally or by gross negligence, or any other liability that cannot be excluded or limited by law (in particular towards consumers).</p>
+<p>14.3 Because the Services are free, our liability, where the law permits, is limited to <strong>CZK 1,000</strong> for all claims combined; this limitation does not apply in the cases under 14.2.</p>
+<h2 id="en-15-termination">15. Termination</h2>
+<p>15.1 You may stop using the Services at any time – uninstall the launcher and ask us to close your Justice Social account by e-mail to <strong><mark class="todo">[DOPLNIT: contact e-mail]</mark></strong> (or in the launcher once this feature is available). We will delete the account and its data according to the Privacy Policy.</p>
+<p>15.2 We may restrict or close an account if you seriously or repeatedly breach these terms or the law, if required for the security of the Services or other users, on an order of an authority, or if we discontinue the Services. We follow section 10 and give reasons for the decision.</p>
+<p>15.3 We may close accounts not used for more than <strong>24 months</strong> after prior notice in the launcher or by e-mail (if known).</p>
+<p>15.4 Provisions that by their nature should survive termination (e.g. the licence to already shared content to the necessary extent, limitation of liability, governing law) continue to apply.</p>
+<h2 id="en-16-changes-to-the-terms">16. Changes to the terms</h2>
+<p>16.1 We may change these terms, in particular because of new features, changes in law, security or requirements of third parties (Mojang, Microsoft, service providers).</p>
+<p>16.2 We will inform you of a material change in the launcher (and on the website) at least <strong>14 days</strong> before it takes effect, except for changes required by law or for security reasons and changes concerning only new features. You will have to <strong>accept the new version again</strong> in the launcher; until then, features requiring an account will not be available.</p>
+<p>16.3 If you do not agree with a change, you may stop using the Services and ask us to close your account. This involves no fees or penalties.</p>
+<p>16.4 Previous versions of the terms are published on the website or sent to you on request.</p>
+<h2 id="en-17-governing-law-and-disputes">17. Governing law and disputes</h2>
+<p>17.1 These terms and the relationships arising from them are governed by the law of the <strong>Czech Republic</strong>, in particular Act No. 89/2012 Coll., the Civil Code. If you are a consumer habitually resident in another country, you do not lose the protection afforded by mandatory provisions of that country's law.</p>
+<p>17.2 Disputes are decided by the competent courts of the Czech Republic. If you are a consumer domiciled in the EU, you may also sue us in the courts of your domicile, and we may sue you only in the courts of your domicile.</p>
+<p>17.3 Before going to court, please write to us – most things can be settled by agreement. If you are a consumer and the rules on out-of-court resolution of consumer disputes apply to us, the competent body is the Czech Trade Inspection Authority (https://adr.coi.gov.cz).</p>
+<h2 id="en-18-final-provisions">18. Final provisions</h2>
+<p>18.1 If any provision is invalid or unenforceable, the other provisions remain unaffected.</p>
+<p>18.2 If we do not enforce a right under these terms immediately, this does not mean we waive it.</p>
+<p>18.3 We may transfer our rights and obligations under these terms to another operator of the Services; we will inform you in advance and, if you disagree, you may stop using the Services.</p>
+<h2 id="en-19-contact">19. Contact</h2>
+<ul><li>Operator: <strong><mark class="todo">[DOPLNIT: operator's full name]</mark></strong></li><li>Address for correspondence: <strong><mark class="todo">[DOPLNIT: address for correspondence]</mark></strong></li><li>E-mail: <strong><mark class="todo">[DOPLNIT: contact e-mail]</mark></strong></li><li>DSA point of contact / reports: <strong><mark class="todo">[DOPLNIT: reporting e-mail]</mark></strong></li></ul></article></main>
+<footer><span data-lang="cs">Nejde o oficiální produkt Minecraft. Není schválen společností Mojang ani Microsoft a není s nimi spojen.</span><span data-lang="en">Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.</span></footer>
+<script>
+(function(){var t={cs:"Podmínky použití",en:"Terms of Use"},r=document.documentElement;
+function set(l,save){r.dataset.lang=l;r.lang=l;document.title=t[l]+" · Justice Client";
+document.querySelectorAll(".lang button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.set===l)});
+if(save)try{localStorage.setItem("jc-lang",l)}catch(e){}}
+document.querySelectorAll(".lang button").forEach(function(b){b.onclick=function(){set(b.dataset.set,1)}});
+set(r.dataset.lang);})();
+</script>
+</body>
+</html>

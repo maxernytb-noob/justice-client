@@ -1,0 +1,41 @@
+{
+  "version": "2026-10-29",
+  "documents": {
+    "terms": { "version": "2026-10-29", "url": "https://justiceclient.online/terms" },
+    "privacy": { "version": "2026-10-29", "url": "https://justiceclient.online/privacy" },
+    "contentPolicy": { "version": "2026-10-29", "url": "https://justiceclient.online/content-policy" }
+  },
+  "minAgeWithoutGuardian": 15,
+  "texts": {
+    "cs": {
+      "title": "Podmínky použití a soukromí",
+      "titleUpdated": "Aktualizovali jsme podmínky",
+      "body": "Justice Client je zdarma a poskytujeme ho „tak, jak je“. Účet Justice Social ukládá jen to, co potřebují přátelé, chat, party a klipy; crash logy a data hry zůstávají ve tvém počítači. Nejde o oficiální produkt Minecraft, není schválen společností Mojang ani Microsoft a není s nimi spojen.",
+      "bodyUpdated": "Změnili jsme Podmínky použití, Zásady ochrany osobních údajů nebo Pravidla obsahu. Abys mohl(a) dál používat účet, přátele, chat a klipy, přečti si je a odsouhlas novou verzi.",
+      "links": {
+        "terms": "Podmínky použití",
+        "privacy": "Zásady ochrany osobních údajů",
+        "contentPolicy": "Pravidla obsahu a komunity"
+      },
+      "checkbox": "Přečetl(a) jsem si Podmínky použití, Zásady ochrany osobních údajů a Pravidla obsahu a souhlasím s nimi. Je mi alespoň 15 let, nebo mám souhlas rodiče či zákonného zástupce.",
+      "accept": "Souhlasím a pokračovat",
+      "decline": "Nesouhlasím",
+      "declineHint": "Bez souhlasu můžeš launcher dál používat k hraní, ale účet Justice Social (přátelé, chat, party, klipy) nebude dostupný."
+    },
+    "en": {
+      "title": "Terms of Use and Privacy",
+      "titleUpdated": "We've updated our terms",
+      "body": "Justice Client is free and provided \"as is\". A Justice Social account stores only what friends, chat, parties and clips need; crash logs and game data stay on your computer. Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.",
+      "bodyUpdated": "We've changed the Terms of Use, the Privacy Policy or the Content Policy. To keep using your account, friends, chat and clips, please read them and accept the new version.",
+      "links": {
+        "terms": "Terms of Use",
+        "privacy": "Privacy Policy",
+        "contentPolicy": "Content and Community Policy"
+      },
+      "checkbox": "I have read and agree to the Terms of Use, the Privacy Policy and the Content Policy. I am at least 15 years old, or I have the consent of a parent or legal guardian.",
+      "accept": "Agree and continue",
+      "decline": "Decline",
+      "declineHint": "Without agreeing you can still use the launcher to play, but the Justice Social account (friends, chat, parties, clips) will not be available."
+    }
+  }
+}

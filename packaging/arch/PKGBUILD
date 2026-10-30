@@ -1,0 +1,57 @@
+# Maintainer: maxem <maxernytb@gmail.com>
+pkgname=justice-client
+pkgver=0.7.6
+pkgrel=1
+pkgdesc="Minecraft launcher pro natáčení — Flashback, max FPS, mody z Modrinthu a CurseForge"
+arch=('x86_64')
+url="https://www.youtube.com/@maxernMC"
+license=('LicenseRef-custom')
+depends=(
+  'webkit2gtk-4.1' 'gtk3' 'hicolor-icon-theme'
+  # Minecraft (LWJGL/GLFW + OpenAL) needs these at runtime; Java is downloaded by the launcher.
+  'libglvnd' 'libx11' 'libxcursor' 'libxrandr' 'libxi' 'alsa-lib'
+  # The Clips player (WebKitGTK <video>) decodes in software through these.
+  'gst-plugins-good' 'gst-libav'
+)
+makedepends=('rust' 'cargo' 'nodejs' 'npm' 'pkgconf')
+optdepends=(
+  'xorg-xrandr: older Minecraft versions (1.12 and below)'
+  'libpulse: sound through PulseAudio/PipeWire'
+  'discord: "Playing Justice Client" status'
+  'obs-studio: automatic recording when the game starts'
+  'gpu-screen-recorder: Justice Clips (replay buffer, AUR)'
+  'ffmpeg: Justice Clips thumbnails and trimming'
+  'libnotify: Justice Clips notifications'
+)
+options=('!lto' '!debug')
+source=("$pkgname-$pkgver.tar.gz"
+        "$pkgname.desktop")
+sha256sums=('afbaaff930e17033ce854065d4c991b5ca17b53e3bf8cd39e1b7784135a7244c'
+            'd6814564181fff3cee300de29d12ba9af40cfd7b01f0b68dfaf4c908a5655870')
+
+prepare() {
+  cd "$srcdir/$pkgname-$pkgver"
+  export CARGO_HOME="$srcdir/cargo-home"
+  npm ci --no-audit --no-fund
+  cargo fetch --locked --manifest-path src-tauri/Cargo.toml --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+  export CARGO_HOME="$srcdir/cargo-home"
+  # Builds the frontend (vite) and the release binary without making a .deb/.rpm bundle.
+  npm run tauri -- build --no-bundle
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  install -Dm755 src-tauri/target/release/justice-client "$pkgdir/usr/bin/justice-client"
+  for jar in src-tauri/resources/justice-mod-*.jar; do
+    install -Dm644 "$jar" "$pkgdir/usr/lib/justice-client/resources/$(basename "$jar")"
+  done
+  install -Dm644 "$srcdir/$pkgname.desktop" "$pkgdir/usr/share/applications/$pkgname.desktop"
+  install -Dm644 src-tauri/icons/32x32.png      "$pkgdir/usr/share/icons/hicolor/32x32/apps/$pkgname.png"
+  install -Dm644 src-tauri/icons/128x128.png    "$pkgdir/usr/share/icons/hicolor/128x128/apps/$pkgname.png"
+  install -Dm644 src-tauri/icons/128x128@2x.png "$pkgdir/usr/share/icons/hicolor/256x256/apps/$pkgname.png"
+  install -Dm644 src-tauri/icons/icon.png       "$pkgdir/usr/share/icons/hicolor/512x512/apps/$pkgname.png"
+}

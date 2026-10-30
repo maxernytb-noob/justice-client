@@ -1,0 +1,21 @@
+# Normalize text to LF in the repo; let Git handle the working-copy line endings.
+* text=auto eol=lf
+
+# Keep shell/PowerShell/batch scripts with their expected endings.
+*.sh    text eol=lf
+*.ps1   text eol=crlf
+*.bat   text eol=crlf
+
+# Binary assets — never touch line endings.
+*.jar   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.webp  binary
+*.ico   binary
+*.icns  binary
+*.ttf   binary
+*.otf   binary
+*.wav   binary
+*.mp3   binary
+*.ogg   binary

@@ -1,0 +1,450 @@
+// Minecraft-style pixel icons (16×16), used instead of emoji so they look the same everywhere.
+// Each map is 16 rows of 16 characters; "." is empty, other letters index the palette.
+
+type Pix = { rows: string[]; pal: Record<string, string> };
+
+const ICONS: Record<string, Pix> = {
+  diamond: {
+    pal: { a: "#0b4f4a", b: "#17a39b", c: "#3fe0d4", d: "#9ffff4", e: "#ffffff" },
+    rows: [
+      "................",
+      "................",
+      ".....aaaaaa.....",
+      "....abbccbba....",
+      "...abcddddcba...",
+      "..abcdeeeedcba..",
+      ".abbcddddddcbba.",
+      ".aabbccccccbbaa.",
+      "..aabbccccbbaa..",
+      "...aabbccbbaa...",
+      "....aabbbbaa....",
+      ".....aabbaa.....",
+      "......aaaa......",
+      ".......aa.......",
+      "................",
+      "................",
+    ],
+  },
+  emerald: {
+    pal: { a: "#0b3d1c", b: "#1e9e4a", c: "#41d36b", d: "#7dffa0", e: "#e8fff0" },
+    rows: [
+      "................",
+      "......aaaa......",
+      ".....abbbba.....",
+      "....abccccba....",
+      "...abcddddcba...",
+      "...abcdeedcba...",
+      "...abcdeedcba...",
+      "...abcddddcba...",
+      "...abcddddcba...",
+      "...abccccccba...",
+      "....abbbbbba....",
+      ".....aaaaaa.....",
+      "................",
+      "................",
+      "................",
+      "................",
+    ],
+  },
+  heart: {
+    pal: { a: "#3b0710", b: "#e11d38", c: "#ffb3bf" },
+    rows: [
+      "................",
+      "................",
+      "..aaaa....aaaa..",
+      ".abbbba..abbbba.",
+      "abccbbbaabbbbbba",
+      "abcbbbbbbbbbbbba",
+      "abbbbbbbbbbbbbba",
+      "abbbbbbbbbbbbbba",
+      ".abbbbbbbbbbbba.",
+      "..abbbbbbbbbba..",
+      "...abbbbbbbba...",
+      "....abbbbbba....",
+      ".....abbbba.....",
+      "......abba......",
+      ".......aa.......",
+      "................",
+    ],
+  },
+  crown: {
+    pal: { a: "#5a3a00", b: "#f5c518", c: "#ffe680", d: "#fff6c8", e: "#e11d38", f: "#3fa9f5" },
+    rows: [
+      "................",
+      "................",
+      "................",
+      ".a.....aa.....a.",
+      "aba...abba...aba",
+      "abba.abccba.abba",
+      "abbbabccccbabbba",
+      "abbbbbcddcbbbbba",
+      "abbbbbbbbbbbbbba",
+      "abbeebbffbbeebba",
+      "abbbbbbbbbbbbbba",
+      "abbbbbbbbbbbbbba",
+      "aaaaaaaaaaaaaaaa",
+      "................",
+      "................",
+      "................",
+    ],
+  },
+  clock: {
+    pal: { a: "#3a2a00", b: "#e0b030", c: "#f4f1e6", d: "#222222" },
+    rows: [
+      "................",
+      ".....aaaaaa.....",
+      "...aabbbbbbaa...",
+      "..abbccccccbba..",
+      ".abccccdcccccba.",
+      ".abccccdcccccba.",
+      "abcccccdccccccba",
+      "abcccccdddddccba",
+      "abccccccccccccba",
+      "abccccccccccccba",
+      ".abccccccccccba.",
+      ".abccccccccccba.",
+      "..abbccccccbba..",
+      "...aabbbbbbaa...",
+      ".....aaaaaa.....",
+      "................",
+    ],
+  },
+  flame: {
+    pal: { a: "#5a1000", b: "#e2401c", c: "#ff8a1c", d: "#ffc93c", e: "#fff3b0" },
+    rows: [
+      "................",
+      ".......a........",
+      "......aba.......",
+      "......abba......",
+      ".....abbba..a...",
+      "....abbcba.aba..",
+      "....abccbbabba..",
+      "...abccccbbbba..",
+      "..abccddccbcba..",
+      "..abcddddccbba..",
+      ".abccddeddccba..",
+      ".abcddeeeddcba..",
+      ".abcdeeeeedcba..",
+      "..abcdeeedcba...",
+      "...aabbbbbaa....",
+      "................",
+    ],
+  },
+  sword: {
+    pal: { a: "#0b2f2c", b: "#3fe0d4", c: "#c9fff9", d: "#8a5a2c", e: "#3a2614" },
+    rows: [
+      "............aaa.",
+      "...........abba.",
+      "..........abcba.",
+      ".........abcba..",
+      "........abcba...",
+      ".......abcba....",
+      "......abcba.....",
+      "..a..abcba......",
+      "..aaabcba.......",
+      "...addba........",
+      "...adda.........",
+      "..adaada........",
+      ".aea..aa........",
+      "aeea............",
+      "aaa.............",
+      "................",
+    ],
+  },
+  skull: {
+    pal: { a: "#2a2a2e", b: "#e8e6dc" },
+    rows: [
+      "................",
+      "................",
+      "...aaaaaaaaaa...",
+      "..abbbbbbbbbba..",
+      ".abbbbbbbbbbbba.",
+      ".abbbbbbbbbbbba.",
+      ".abaaabbbbaaaba.",
+      ".abaaabbbbaaaba.",
+      ".abbbbbaabbbbba.",
+      ".abbbbbbbbbbbba.",
+      "..abababababba..",
+      "..abbbbbbbbbba..",
+      "...aaaaaaaaaa...",
+      "................",
+      "................",
+      "................",
+    ],
+  },
+  bolt: {
+    pal: { a: "#5a4500", b: "#ffd43b" },
+    rows: [
+      "........aaaa....",
+      ".......abbba....",
+      "......abbba.....",
+      ".....abbba......",
+      "....abbbaaaaa...",
+      "...abbbbbbbba...",
+      "...aaaaabbba....",
+      ".......abba.....",
+      "......abba......",
+      ".....abba.......",
+      "....aba.........",
+      "....aa..........",
+      "................",
+      "................",
+      "................",
+      "................",
+    ],
+  },
+  steve: {
+    pal: { a: "#3b2512", b: "#c8936c", c: "#ffffff", d: "#3a52a8", e: "#8a5a3c", f: "#6b3f28" },
+    rows: [
+      "................",
+      "................",
+      "..aaaaaaaaaaaa..",
+      "..aaaaaaaaaaaa..",
+      "..abbbbbbbbbba..",
+      "..bbbbbbbbbbbb..",
+      "..bcdbbbbbbdcb..",
+      "..bbbbbeebbbbb..",
+      "..bbbffffffbbb..",
+      "..bbbbbbbbbbbb..",
+      "..bbbbbbbbbbbb..",
+      "..bbbbbbbbbbbb..",
+      "................",
+      "................",
+      "................",
+      "................",
+    ],
+  },
+  trophy: {
+    pal: { a: "#5a3a00", b: "#f5c518", c: "#fff6c8" },
+    rows: [
+      "................",
+      "...aaaaaaaaaa...",
+      ".aabbbbbbbbbbaa.",
+      "ab.abbbcbbbba.ba",
+      "ab.abbbcbbbba.ba",
+      ".ab.abbbbbba.ba.",
+      "..aaabbbbbbaaa..",
+      "....abbbbbba....",
+      ".....abbbba.....",
+      "......abba......",
+      "......abba......",
+      ".....abbbba.....",
+      "....aaaaaaaa....",
+      "....abbbbbba....",
+      "....aaaaaaaa....",
+      "................",
+    ],
+  },
+  lock: {
+    pal: { a: "#6a6a74", b: "#c4c4ce" },
+    rows: [
+      "................",
+      ".....aaaaaa.....",
+      "....ab....ba....",
+      "....a......a....",
+      "....a......a....",
+      "..aaaaaaaaaaaa..",
+      "..abbbbbbbbbba..",
+      "..abbbbaabbbba..",
+      "..abbbbaabbbba..",
+      "..abbbbaabbbba..",
+      "..abbbbbbbbbba..",
+      "..aaaaaaaaaaaa..",
+      "................",
+      "................",
+      "................",
+      "................",
+    ],
+  },
+  check: {
+    pal: { a: "#0d4d22", b: "#4ade80" },
+    rows: [
+      "................",
+      "................",
+      "................",
+      "................",
+      "............aa..",
+      "...........aba..",
+      "..........abba..",
+      ".aa......abba...",
+      "abba....abba....",
+      ".abba..abba.....",
+      "..abbaabba......",
+      "...abbbba.......",
+      "....abba........",
+      ".....aa.........",
+      "................",
+      "................",
+    ],
+  },
+  note: {
+    pal: { a: "#c0263c", b: "#ff7a8e" },
+    rows: [
+      "................",
+      ".......aaaaaaa..",
+      ".......abbbbba..",
+      ".......aaaaaba..",
+      ".......a....ba..",
+      ".......a....ba..",
+      ".......a....ba..",
+      ".......a....ba..",
+      ".......a.aaaba..",
+      "....aaaa.abbba..",
+      "...abbba.aaaa...",
+      "...abbba........",
+      "....aaa.........",
+      "................",
+      "................",
+      "................",
+    ],
+  },
+  torch: {
+    pal: { a: "#3a2614", b: "#ff8a1c", c: "#fff3b0", d: "#8a5a3c" },
+    rows: [
+      "................",
+      ".......aa.......",
+      "......abba......",
+      ".....abccba.....",
+      ".....abccba.....",
+      "......abba......",
+      "......adda......",
+      "......adda......",
+      "......adda......",
+      "......adda......",
+      "......adda......",
+      "......adda......",
+      "......aaaa......",
+      "................",
+      "................",
+      "................",
+    ],
+  },
+  sheep: {
+    pal: { a: "#8a8a8a", b: "#f2f2f2", c: "#e8d2b8", d: "#2b2b2b", e: "#e6a0a8" },
+    rows: [
+      "................",
+      "................",
+      "..aaaaaaaaaaaa..",
+      "..abbbbbbbbbba..",
+      "..abbbbbbbbbba..",
+      "..abbccccccbba..",
+      "..abcdccccdcba..",
+      "..abccceeccbba..",
+      "..abbccccccbba..",
+      "..abbbbbbbbbba..",
+      "..aaaaaaaaaaaa..",
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+    ],
+  },
+  disc: {
+    pal: { a: "#111111", b: "#2b2b2f", c: "#45454d", d: "#e11d38", e: "#ffd43b" },
+    rows: [
+      "................",
+      ".....aaaaaa.....",
+      "...aabbbbbbaa...",
+      "..abbbbbbbbbba..",
+      ".abbbccccccbbba.",
+      ".abbcbbbbbbcbba.",
+      "abbcbbbddbbbcbba",
+      "abbcbbdeedbbcbba",
+      "abbcbbdeedbbcbba",
+      "abbcbbbddbbbcbba",
+      ".abbcbbbbbbcbba.",
+      ".abbbccccccbbba.",
+      "..abbbbbbbbbba..",
+      "...aabbbbbbaa...",
+      ".....aaaaaa.....",
+      "................",
+    ],
+  },
+  chest: {
+    pal: { a: "#3a2614", b: "#8a5a2c", c: "#b07a3c", d: "#9aa0a8", e: "#2b2b2b" },
+    rows: [
+      "................",
+      "................",
+      ".aaaaaaaaaaaaaa.",
+      ".abbbbbbbbbbbba.",
+      ".abccccccccccba.",
+      ".abccccccccccba.",
+      ".aaaaaaddaaaaaa.",
+      ".abbbbbdebbbbba.",
+      ".abccccddccccba.",
+      ".abccccccccccba.",
+      ".abccccccccccba.",
+      ".abbbbbbbbbbbba.",
+      ".aaaaaaaaaaaaaa.",
+      "................",
+      "................",
+      "................",
+    ],
+  },
+  clapper: {
+    pal: { a: "#111114", b: "#2e2e36", c: "#f2f2f2", d: "#e11d38" },
+    rows: [
+      "................",
+      "................",
+      ".aaaaaaaaaaaaaa.",
+      ".abcbcbcbcbcbca.",
+      ".aaaaaaaaaaaaaa.",
+      ".abbbbbbbbbbbba.",
+      ".abbbbbbbbbbbba.",
+      ".abbbbddbbbbbba.",
+      ".abbbbdddbbbbba.",
+      ".abbbbddbbbbbba.",
+      ".abbbbbbbbbbbba.",
+      ".aaaaaaaaaaaaaa.",
+      "................",
+      "................",
+      "................",
+      "................",
+    ],
+  },
+};
+
+const GRAY: Record<string, string> = { a: "#2a2a2e", b: "#7a7a84", c: "#a0a0aa", d: "#c0c0c8", e: "#e0e0e6", f: "#9a9aa4" };
+
+/** Rects for one icon, horizontal runs merged so an icon is a few dozen rects at most. */
+function rects(p: Pix, gray: boolean): { x: number; y: number; w: number; fill: string }[] {
+  const out: { x: number; y: number; w: number; fill: string }[] = [];
+  p.rows.forEach((row, y) => {
+    let x = 0;
+    while (x < 16) {
+      const ch = row[x];
+      if (!ch || ch === ".") {
+        x++;
+        continue;
+      }
+      let w = 1;
+      while (row[x + w] === ch) w++;
+      out.push({ x, y, w, fill: (gray ? GRAY[ch] : p.pal[ch]) ?? "#000" });
+      x += w;
+    }
+  });
+  return out;
+}
+
+export const MC_ICONS = Object.keys(ICONS);
+
+export function McIcon({ name, size = 20, gray = false, className = "" }: { name: string; size?: number; gray?: boolean; className?: string }) {
+  const p = ICONS[name] ?? ICONS.diamond;
+  return (
+    <svg className={`mc-icon ${className}`} width={size} height={size} viewBox="0 0 16 16" shapeRendering="crispEdges" aria-hidden="true">
+      {rects(p, gray).map((r, i) => (
+        <rect key={i} x={r.x} y={r.y} width={r.w} height={1} fill={r.fill} />
+      ))}
+    </svg>
+  );
+}
+
+/** The same icon as an SVG string, for DOM effects outside React (falling diamonds). */
+export function mcSvg(name: string, size = 20): string {
+  const p = ICONS[name] ?? ICONS.diamond;
+  const body = rects(p, false)
+    .map((r) => `<rect x="${r.x}" y="${r.y}" width="${r.w}" height="1" fill="${r.fill}"/>`)
+    .join("");
+  return `<svg width="${size}" height="${size}" viewBox="0 0 16 16" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
+}
