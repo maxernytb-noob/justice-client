@@ -1,6 +1,6 @@
 # Maintainer: maxem <maxernytb@gmail.com>
 pkgname=justice-client
-pkgver=0.7.6
+pkgver=0.8.1
 pkgrel=1
 pkgdesc="Minecraft launcher pro natáčení — Flashback, max FPS, mody z Modrinthu a CurseForge"
 arch=('x86_64')
@@ -26,7 +26,7 @@ optdepends=(
 options=('!lto' '!debug')
 source=("$pkgname-$pkgver.tar.gz"
         "$pkgname.desktop")
-sha256sums=('afbaaff930e17033ce854065d4c991b5ca17b53e3bf8cd39e1b7784135a7244c'
+sha256sums=('250ac10243a715c6a2c54802fa089761e9dea9fc4349e70af84c0dee6564ad21'
             'd6814564181fff3cee300de29d12ba9af40cfd7b01f0b68dfaf4c908a5655870')
 
 prepare() {

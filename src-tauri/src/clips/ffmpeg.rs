@@ -64,6 +64,26 @@ pub fn command(ffmpeg: &Path, priority: u32) -> Command {
     c
 }
 
+/// Whether this machine's ffmpeg can actually encode with `hevc_nvenc` (NVIDIA GPU + driver).
+/// Probed once with a tiny throwaway encode and cached. On anything without working NVENC — most
+/// Linux boxes, AMD/Intel GPUs — this is false and callers fall back to a software encoder instead
+/// of letting ffmpeg fail with "Invalid argument" and write nothing.
+pub fn hevc_nvenc_ok(ffmpeg: &Path) -> bool {
+    use std::sync::OnceLock;
+    static OK: OnceLock<bool> = OnceLock::new();
+    *OK.get_or_init(|| {
+        command(ffmpeg, 0)
+            .args([
+                "-hide_banner", "-loglevel", "error", "-nostdin",
+                "-f", "lavfi", "-i", "color=black:s=128x128:r=5:d=0.2",
+                "-frames:v", "3", "-c:v", "hevc_nvenc", "-f", "null", "-",
+            ])
+            .status()
+            .map(|s| s.success())
+            .unwrap_or(false)
+    })
+}
+
 /// Runs ffmpeg to completion, returning the tail of stderr as the error.
 pub fn run(ffmpeg: &Path, args: &[String], priority: u32) -> anyhow::Result<()> {
     let out = command(ffmpeg, priority)

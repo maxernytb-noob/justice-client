@@ -521,7 +521,12 @@ pub fn trim(app: &AppHandle, ff: &Path, clips: &Path, r: &TrimReq) -> anyhow::Re
     }
     let filtered = !vf.is_empty() || !af.is_empty();
 
-    if r.precise {
+    // "Precise" re-encodes for a frame-accurate cut. Use NVENC HEVC only when this machine really has
+    // it; otherwise (Linux/AMD/Intel, no NVENC) fall back to a universal software H.264 encode so the
+    // trim doesn't fail with "Invalid argument" and write an empty file.
+    let use_hevc = r.precise && ffmpeg::hevc_nvenc_ok(ff);
+    let soft_h264 = !use_hevc && (r.precise || filtered);
+    if use_hevc {
         a.extend(
             [
                 "-c:v", "hevc_nvenc", "-preset", "p7", "-tune", "hq", "-multipass", "fullres", "-rc", "vbr", "-cq", "19", "-b:v", "0",
@@ -529,8 +534,8 @@ pub fn trim(app: &AppHandle, ff: &Path, clips: &Path, r: &TrimReq) -> anyhow::Re
             ]
             .map(String::from),
         );
-    } else if filtered {
-        // Filtered but not "precise": a universal CPU encode (any GPU, and H.264 plays everywhere).
+    } else if soft_h264 {
+        // No NVENC, or a filtered non-precise cut: a universal CPU encode (any GPU, and H.264 plays everywhere).
         a.extend(["-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p"].map(String::from));
     } else {
         a.extend(["-c", "copy"].map(String::from));
@@ -547,8 +552,9 @@ pub fn trim(app: &AppHandle, ff: &Path, clips: &Path, r: &TrimReq) -> anyhow::Re
         a.extend(["-c:a", "copy"].map(String::from));
     }
     a.extend(["-disposition:a:0", "default"].map(String::from));
-    // HEVC output keeps the hvc1 tag; the libx264 (filtered, non-precise) output must not.
-    if !(filtered && !r.precise) {
+    // HEVC output (NVENC re-encode or a stream copy of the HEVC source) keeps the hvc1 tag; the
+    // software H.264 output must not.
+    if !soft_h264 {
         a.extend(["-tag:v", "hvc1"].map(String::from));
     }
     a.extend(["-movflags", "+faststart", "-progress", "pipe:1", "-f", "mp4"].map(String::from));

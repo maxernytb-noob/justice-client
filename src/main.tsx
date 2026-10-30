@@ -46,10 +46,18 @@ async function boot() {
 async function bootLogs() {
   if (import.meta.env.DEV && !("__TAURI_INTERNALS__" in window)) await import("./devMock");
   document.documentElement.classList.add("logswin-root");
-  const [{ createRoot }, { default: LogsWindow }] = await Promise.all([
+  const [{ createRoot }, { default: LogsWindow }, { api }, { setLang }] = await Promise.all([
     import("react-dom/client"),
     import("./LogsWindow"),
+    import("./api"),
+    import("./i18n"),
   ]);
+  // This window has no store, so pick up the launcher's language ourselves — otherwise tr() stays Czech.
+  try {
+    setLang((await api.getSettings()).language);
+  } catch {
+    /* fall back to the default language */
+  }
   createRoot(document.getElementById("root")!).render(<LogsWindow />);
 }
 
