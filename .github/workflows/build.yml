@@ -54,6 +54,8 @@ jobs:
       - run: npm ci
 
       - name: Build
+        # bash on every OS (incl. Windows via Git Bash) so the inline --config JSON quoting is identical.
+        shell: bash
         # Skip updater artifacts in CI: they need the private signing key, which never leaves the dev machine.
         run: npm run tauri build -- ${{ matrix.args }} --config "{\"bundle\":{\"createUpdaterArtifacts\":false}}"
 
